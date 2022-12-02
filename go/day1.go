@@ -14,16 +14,16 @@ func main() {
 	scanner := bufio.NewScanner(file)
 
 	calorieTotals := []int{}
-	elfItems := []int{}
+	elfItemCalories := []int{}
 	for scanner.Scan() {
 		line := scanner.Text()
 		if line == "" {
-			calorieTotals = append(calorieTotals, sum(elfItems))
-			elfItems = []int{}
+			calorieTotals = append(calorieTotals, sum(elfItemCalories))
+			elfItemCalories = []int{}
 			continue
 		}
 		itemCalories, _ := strconv.Atoi(line)
-		elfItems = append(elfItems, itemCalories)
+		elfItemCalories = append(elfItemCalories, itemCalories)
 	}
 
 	sort.Slice(calorieTotals, func(i, j int) bool {
