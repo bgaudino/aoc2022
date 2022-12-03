@@ -12,11 +12,14 @@ type item rune
 func (i item) points() int {
 	code := int(i)
 	// lowercase
-	if code >= 97 {
+	if code >= 97 && code <= 122 {
 		return code - 96
 	}
 	// uppercase
-	return code - 38
+	if code >= 65 && code <= 90 {
+		return code - 38
+	}
+	return 0
 }
 
 type rucksack map[item]bool
