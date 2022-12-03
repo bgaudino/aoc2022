@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"strings"
 )
 
 type item rune
@@ -68,7 +67,7 @@ func main() {
 	part2Total := 0
 	g := group{}
 	for scanner.Scan() {
-		line := strings.Trim(scanner.Text(), " ")
+		line := scanner.Text()
 		r1, r2 := make(rucksack), make(rucksack)
 		found := false
 		m := len(line) / 2
