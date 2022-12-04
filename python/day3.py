@@ -1,3 +1,6 @@
+from utils import get_data
+
+
 class Item(str):
     @property
     def points(self):
@@ -23,11 +26,12 @@ class Group(list):
         return items.pop()
 
 
-part_1_total = 0
-part_2_total = 0
-with open('data/day3.txt', 'r') as file:
+def main():
+
+    part_1_total = 0
+    part_2_total = 0
     group = Group()
-    for line in file:
+    for line in get_data(3):
         line = line.strip()
         middle = len(line) // 2
 
@@ -42,5 +46,8 @@ with open('data/day3.txt', 'r') as file:
             part_2_total += group.badge.points
             group = Group()
 
-print(part_1_total)
-print(part_2_total)
+    return part_1_total, part_2_total
+
+
+if __name__ == '__main__':
+    print(main())
