@@ -1,9 +1,7 @@
 package main
 
 import (
-	"bufio"
-	"fmt"
-	"os"
+	"main.go/go/helpers"
 )
 
 type item rune
@@ -59,12 +57,10 @@ func (g group) badge() item {
 	return rucksack.pop()
 }
 
-func main() {
-	file, _ := os.Open("../data/day3.txt")
-	scanner := bufio.NewScanner(file)
+func day3() (p1, p2 int) {
+	file, scanner := helpers.GetFile(3)
+	defer file.Close()
 
-	part1Total := 0
-	part2Total := 0
 	g := group{}
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -78,16 +74,15 @@ func main() {
 				r1.add(it)
 			} else if !found && r1.has(it) {
 				found = true
-				part1Total += it.points()
+				p1 += it.points()
 			}
 		}
 		g = append(g, r2)
 		if len(g) == 3 {
-			part2Total += g.badge().points()
+			p2 += g.badge().points()
 			g = group{}
 		}
 	}
 
-	fmt.Println(part1Total)
-	fmt.Println(part2Total)
+	return p1, p2
 }

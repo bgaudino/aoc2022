@@ -1,11 +1,10 @@
 package main
 
 import (
-	"bufio"
-	"fmt"
-	"os"
 	"strconv"
 	"strings"
+
+	"main.go/go/helpers"
 )
 
 type elfPair struct {
@@ -40,24 +39,20 @@ func (e elfPair) opposite() elfPair {
 	return elfPair{e.b, e.a}
 }
 
-func main() {
-	file, _ := os.Open("../data/day4.txt")
-	scanner := bufio.NewScanner(file)
-
-	fullOverlapCount := 0
-	paritalOverlapCount := 0
+func day4() (p1, p2 int) {
+	file, scanner := helpers.GetFile(4)
+	defer file.Close()
 	for scanner.Scan() {
 		pair := getElfPair(strings.Split(scanner.Text(), ","))
 		if pair.fullyOverlaps() {
-			fullOverlapCount++
-			paritalOverlapCount++
+			p1++
+			p2++
 		} else if pair.partiallyOverlaps() {
-			paritalOverlapCount++
+			p2++
 		}
 	}
 
-	fmt.Println(fullOverlapCount)
-	fmt.Println(paritalOverlapCount)
+	return p1, p2
 }
 
 func getElfPair(s []string) elfPair {

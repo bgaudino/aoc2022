@@ -1,24 +1,22 @@
 package main
 
 import (
-	"bufio"
-	"fmt"
-	"os"
 	"sort"
 	"strconv"
+
+	"main.go/go/helpers"
 )
 
-func main() {
-	file, _ := os.Open("../data/day1.txt")
-	defer file.Close()
-	scanner := bufio.NewScanner(file)
-
+func day1() (int, int) {
 	calorieTotals := []int{}
 	elfItemCalories := []int{}
+	file, scanner := helpers.GetFile(1)
+	defer file.Close()
+
 	for scanner.Scan() {
 		line := scanner.Text()
 		if line == "" {
-			calorieTotals = append(calorieTotals, sum(elfItemCalories))
+			calorieTotals = append(calorieTotals, helpers.Sum(elfItemCalories))
 			elfItemCalories = []int{}
 			continue
 		}
@@ -30,17 +28,5 @@ func main() {
 		return calorieTotals[i] > calorieTotals[j]
 	})
 
-	// Part one
-	fmt.Println(calorieTotals[0])
-
-	// Part two
-	fmt.Println(sum(calorieTotals[:3]))
-}
-
-func sum(nums []int) int {
-	s := 0
-	for _, n := range nums {
-		s += n
-	}
-	return s
+	return calorieTotals[0], helpers.Sum(calorieTotals[:3])
 }

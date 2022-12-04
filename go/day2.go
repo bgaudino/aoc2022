@@ -1,44 +1,33 @@
 package main
 
 import (
-	"bufio"
-	"fmt"
-	"os"
 	"strings"
+
+	"main.go/go/helpers"
 )
 
-var rock = 1
-var paper = 2
-var scissors = 3
-
-var loss = 0
-var draw = 3
-var win = 6
+var rock, paper, scissors = 1, 2, 3
+var loss, draw, win = 0, 3, 6
 
 var elfCodes = map[string]int{"A": rock, "B": paper, "C": scissors}
 var myCodes = map[string]int{"X": rock, "Y": paper, "Z": scissors}
 var outcomeCodes = map[string]int{"X": loss, "Y": draw, "Z": win}
 
-var shapes = []int{1, 2, 3}
+func day2() (p1, p2 int) {
+	file, scanner := helpers.GetFile(2)
+	defer file.Close()
 
-func main() {
-	file, _ := os.Open("../data/day2.txt")
-	scanner := bufio.NewScanner(file)
-
-	partOnePoints := 0
-	partTwoPoints := 0
 	for scanner.Scan() {
 		codes := strings.Split(scanner.Text(), " ")
 
 		elf, me := elfCodes[codes[0]], myCodes[codes[1]]
-		partOnePoints += me + getOutcomePoints(elf, me)
+		p1 += me + getOutcomePoints(elf, me)
 
 		outcome := outcomeCodes[codes[1]]
-		partTwoPoints += outcome + getShapePointsByOutcome(elf, outcome)
+		p2 += outcome + getShapePointsByOutcome(elf, outcome)
 	}
 
-	fmt.Println(partOnePoints)
-	fmt.Println(partTwoPoints)
+	return p1, p2
 }
 
 func getOutcomePoints(s1 int, s2 int) int {
