@@ -1,17 +1,19 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 )
 
 func test(n int, d day, t *testing.T) {
 	part1, part2 := d.solution()
-	if part1 != d.answers[0] {
-		t.Error("Day", n, "(part 1): Expected", d.answers[0], "got", part1)
+	if part1 != d.answer.part1 {
+		t.Error("Day", n, "(part 1): Expected", d.answer.part1, "got", part1)
 	}
-	if part2 != d.answers[1] {
-		t.Error("Day", n, "(part 2): Expected", d.answers[1], "got", part2)
+	if part2 != d.answer.part2 {
+		t.Error("Day", n, "(part 2): Expected", d.answer.part2, "got", part2)
 	}
+	fmt.Println("Day", n, ": OK")
 }
 
 func Test(t *testing.T) {
