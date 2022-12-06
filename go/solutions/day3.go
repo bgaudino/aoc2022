@@ -1,4 +1,4 @@
-package main
+package solutions
 
 import (
 	"strconv"
@@ -59,7 +59,7 @@ func (g group) badge() item {
 	return rucksack.pop()
 }
 
-func day3() (string, string) {
+func Day3() (string, string) {
 	file, scanner := helpers.GetFile(3)
 	defer file.Close()
 

@@ -1,4 +1,4 @@
-package main
+package solutions
 
 import (
 	"strconv"
@@ -39,7 +39,7 @@ func (e elfPair) opposite() elfPair {
 	return elfPair{e.b, e.a}
 }
 
-func day4() (string, string) {
+func Day4() (string, string) {
 	file, scanner := helpers.GetFile(4)
 	defer file.Close()
 

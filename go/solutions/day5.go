@@ -1,4 +1,4 @@
-package main
+package solutions
 
 import (
 	"strconv"
@@ -7,7 +7,7 @@ import (
 	"main.go/go/helpers"
 )
 
-func day5() (string, string) {
+func Day5() (string, string) {
 	diagram, instructions := parseInput()
 
 	// Part 1

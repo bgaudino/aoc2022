@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+
+	"main.go/go/solutions"
 )
 
 type solution func() (string, string)
@@ -17,11 +19,11 @@ type day struct {
 }
 
 var days = []day{
-	{day1, answer{"72070", "211805"}},
-	{day2, answer{"14297", "10498"}},
-	{day3, answer{"7826", "2577"}},
-	{day4, answer{"424", "804"}},
-	{day5, answer{"FJSRQCFTN", "CJVLJQPHS"}},
+	{solutions.Day1, answer{"72070", "211805"}},
+	{solutions.Day2, answer{"14297", "10498"}},
+	{solutions.Day3, answer{"7826", "2577"}},
+	{solutions.Day4, answer{"424", "804"}},
+	{solutions.Day5, answer{"FJSRQCFTN", "CJVLJQPHS"}},
 }
 
 func main() {

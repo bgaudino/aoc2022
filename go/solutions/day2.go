@@ -1,4 +1,4 @@
-package main
+package solutions
 
 import (
 	"strconv"
@@ -14,7 +14,7 @@ var elfCodes = map[string]int{"A": rock, "B": paper, "C": scissors}
 var myCodes = map[string]int{"X": rock, "Y": paper, "Z": scissors}
 var outcomeCodes = map[string]int{"X": loss, "Y": draw, "Z": win}
 
-func day2() (string, string) {
+func Day2() (string, string) {
 	file, scanner := helpers.GetFile(2)
 	defer file.Close()
 

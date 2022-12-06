@@ -1,4 +1,4 @@
-package main
+package solutions
 
 import (
 	"sort"
@@ -7,7 +7,7 @@ import (
 	"main.go/go/helpers"
 )
 
-func day1() (string, string) {
+func Day1() (string, string) {
 	calorieTotals := []int{}
 	elfItemCalories := []int{}
 	file, scanner := helpers.GetFile(1)
