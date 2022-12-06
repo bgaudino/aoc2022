@@ -7,7 +7,7 @@ import (
 	"main.go/go/helpers"
 )
 
-func day1() (int, int) {
+func day1() (string, string) {
 	calorieTotals := []int{}
 	elfItemCalories := []int{}
 	file, scanner := helpers.GetFile(1)
@@ -28,5 +28,6 @@ func day1() (int, int) {
 		return calorieTotals[i] > calorieTotals[j]
 	})
 
-	return calorieTotals[0], helpers.Sum(calorieTotals[:3])
+	p1, p2 := strconv.Itoa(calorieTotals[0]), strconv.Itoa(helpers.Sum(calorieTotals[:3]))
+	return p1, p2
 }

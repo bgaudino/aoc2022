@@ -39,9 +39,11 @@ func (e elfPair) opposite() elfPair {
 	return elfPair{e.b, e.a}
 }
 
-func day4() (p1, p2 int) {
+func day4() (string, string) {
 	file, scanner := helpers.GetFile(4)
 	defer file.Close()
+
+	p1, p2 := 0, 0
 	for scanner.Scan() {
 		pair := getElfPair(strings.Split(scanner.Text(), ","))
 		if pair.fullyOverlaps() {
@@ -52,7 +54,7 @@ func day4() (p1, p2 int) {
 		}
 	}
 
-	return p1, p2
+	return strconv.Itoa(p1), strconv.Itoa(p2)
 }
 
 func getElfPair(s []string) elfPair {

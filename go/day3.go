@@ -1,6 +1,8 @@
 package main
 
 import (
+	"strconv"
+
 	"main.go/go/helpers"
 )
 
@@ -57,10 +59,11 @@ func (g group) badge() item {
 	return rucksack.pop()
 }
 
-func day3() (p1, p2 int) {
+func day3() (string, string) {
 	file, scanner := helpers.GetFile(3)
 	defer file.Close()
 
+	p1, p2 := 0, 0
 	g := group{}
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -84,5 +87,5 @@ func day3() (p1, p2 int) {
 		}
 	}
 
-	return p1, p2
+	return strconv.Itoa(p1), strconv.Itoa(p2)
 }
