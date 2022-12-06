@@ -3,7 +3,8 @@ from utils import get_data
 
 def main():
     data = get_data(5)
-    crate_mover_9000, crate_mover_9001 = CrateMover9000(data), CrateMover9001(data)
+    crate_mover_9000, crate_mover_9001 = CrateMover9000(
+        data), CrateMover9001(data)
     crate_mover_9000.rearrange()
     crate_mover_9001.rearrange()
     return crate_mover_9000.top_of_each_stack, crate_mover_9001.top_of_each_stack
@@ -43,8 +44,8 @@ class CrateMover9000:
 class CrateMover9001(CrateMover9000):
     def perform_move(self, quantity, from_stack, to_stack):
         index = len(self.stacks[from_stack]) - quantity
-        self.stacks[to_stack] += self.stacks[from_stack][:index]
-        self.stacks[from_stack] = self.stacks[from_stack][index:]
+        self.stacks[to_stack] += self.stacks[from_stack][index:]
+        self.stacks[from_stack] = self.stacks[from_stack][:index]
 
 
 if __name__ == '__main__':
