@@ -43,13 +43,14 @@ def main():
             continue
 
         # cd
-        if parts[2] == "/":
+        pwd = parts[2]
+        if pwd == "/":
             cursor = root
             continue
-        if parts[2] == "..":
+        if pwd == "..":
             cursor = cursor.parent
             continue
-        cursor = cursor.children[parts[2]]
+        cursor = cursor.children[pwd]
 
     total_size, sizes = dir_sizes(root)
     available_space = 70000000 - total_size

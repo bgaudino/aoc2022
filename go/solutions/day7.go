@@ -58,15 +58,16 @@ func Day7() (string, string) {
 		}
 
 		// cd
-		if parts[2] == "/" {
+		pwd := parts[2]
+		if pwd == "/" {
 			cursor = &root
 			continue
 		}
-		if parts[2] == ".." {
+		if pwd == ".." {
 			cursor = cursor.parent
 			continue
 		}
-		cursor = cursor.children[parts[2]]
+		cursor = cursor.children[pwd]
 	}
 	totalSize, sizes := root.getSizes()
 	availableSpace := 70000000 - totalSize
