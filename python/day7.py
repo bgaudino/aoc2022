@@ -3,7 +3,7 @@ from utils import get_data
 
 class Directory:
     def __init__(self, parent=None):
-        self.sizeOfFiles = 0
+        self.size_of_files = 0
         self.parent = parent
         self.children = {}
 
@@ -11,7 +11,7 @@ class Directory:
         sizes = []
 
         def dir_size(dir):
-            size = dir.size
+            size = dir.size_of_files
             size += sum([dir_size(c) for c in dir.children.values()])
             sizes.append(size)
             return size
@@ -34,7 +34,7 @@ def main():
         # file
         if not line.startswith('$'):
             size = int(parts[0])
-            cursor.sizeOfFiles += size
+            cursor.size_of_files += size
             continue
 
         # ls
