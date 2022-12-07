@@ -1,23 +1,33 @@
-import re
 from utils import get_data
 
 
 class FileSystem:
     def __init__(self):
         self.dirs = {'/': {}}
-        self.pwd = '/'
+        self.cwd = '/'
         self.path = ['/']
+        self.is_listing = False
+        self.current_dir = {}
 
-    def update_filesystem(self, data):
+    def update_filesystem(self):
         fs = self.dirs
         for i, p in enumerate(self.path):
             if i == len(self.path) - 1:
-                if p not in fs:
-                    fs[p] = data
-                else:
-                    fs[p] = {**fs[p], **data}
+                fs[p] = self.current_dir
                 break
             fs = fs[p]
+
+    def process_command(self, command):
+        if command.startswith('$ cd'):
+            if self.is_listing:
+                self.update_filesystem()
+            self.is_listing = False
+            cwd = command.split(' ')[-1]
+            self.cd(cwd)
+            self.current_dir = {}
+
+        if command.startswith('$ ls'):
+            self.is_listing = True
 
     def cd(self, dir):
         if dir == '/':
@@ -27,140 +37,45 @@ class FileSystem:
         else:
             self.path.append(dir)
 
+    def add_item(self, data):
+        if data.startswith('dir'):
+            key = data.split(' ')[-1]
+            if key not in self.current_dir:
+                self.current_dir[key] = {}
+        else:
+            size, file = data.split(' ')
+            self.current_dir[file] = int(size)
+
+    def dir_sizes(self):
+        sizes = []
+
+        def dir_size(dir):
+            size = sum([v for v in dir.values() if type(v) == int])
+            size += sum(
+                [dir_size(v) for v in dir.values() if type(v) == dict]
+            )
+            sizes.append(size)
+            return size
+
+        return dir_size(self.dirs['/']), sizes
+
 
 def main():
-    filesystem = {'/': {}}
-    pwd = '/'
-    path = [pwd]
-    dir = {}
-    is_listing = False
-
+    f = FileSystem()
     for line in get_data(7):
-        if line.startswith('$ cd'):
-            if is_listing:
-                update_filesystem(filesystem, path, dir)
-                is_listing = False
-
-            pwd = line.split(' ')[-1]
-            if pwd == '/':
-                path = ['/']
-            elif pwd == '..':
-                path.pop()
-            else:
-                path.append(pwd)
-
-            fs = filesystem
-            for p in path:
-                fs = fs[p]
-            dir = fs
-        elif line.startswith('$ ls'):
-            is_listing = True
-        elif line.startswith('dir'):
-            key = line.split(' ')[-1]
-            if key not in dir:
-                dir[key] = {}
+        if line.startswith('$'):
+            f.process_command(line)
         else:
-            size, file = line.split(' ')
-            dir[file] = int(size)
+            f.add_item(line)
+    if f.is_listing:
+        f.update_filesystem()
 
-    if is_listing:
-        update_filesystem(filesystem, path, dir)
+    total_size, sizes = f.dir_sizes()
+    available_space = 70000000 - total_size
+    space_to_free = 30000000 - available_space
 
-    sizes = {}
-
-    def dir_size(dir, key):
-        size = sum([v for v in dir.values() if type(v) == int])
-        size += sum(
-            [dir_size(v, k) for k, v in dir.items() if type(v) == dict]
-        )
-        sizes[key] = size
-        print(sizes)
-        return size
-    fs = filesystem['/']
-    dir_size(fs, '/')
-    from pprint import pprint
-    pprint(sizes)
-    return sum(s for s in sizes.values() if s <= 100000)
-
-
-def update_filesystem(filesystem, path, dir):
-    fs = filesystem
-    for i, p in enumerate(path):
-        if i == len(path) - 1:
-            if p not in fs:
-                fs[p] = dir
-            else:
-                fs[p] = {**fs[p], **dir}
-            break
-        fs = fs[p]
-    return filesystem
+    return sum([s for s in sizes if s <= 100000]), min([s for s in sizes if s >= space_to_free])
 
 
 if __name__ == '__main__':
     print(main())
-
-
-with open('data/day7.txt') as input_data:
-    input_data = [line.strip('\n') for line in input_data.readlines()]
-    current_dir = [r'/']
-    dirs = {}
-    for line in input_data[1:]:
-        current_dir = current_dir
-
-        if line.startswith('$ cd'):
-            if not line.endswith('..'):
-                current_dir.append(line[5:])
-            else:
-                current_dir.pop()
-
-        if line[0].isdigit():
-            for i in range(1, len(current_dir)+1):
-                try:
-                    dirs[current_dir[-i]].append(line)
-                except KeyError:
-                    dirs[current_dir[-i]] = []
-                    dirs[current_dir[-i]].append(line)
-
-
-totals = []
-for dir, files in dirs.items():
-    sizes = [z.split(' ')[0] for z in files]
-    total_size = sum(int(x) for x in sizes)
-    dirs[dir] = total_size
-    totals.append(total_size)
-
-totals = [a for a in totals if a <= 100000]
-print(sum(totals))
-
-
-with open('data/day7.txt') as input_data:
-    input_data = [line.strip('\n') for line in input_data.readlines()]
-    current_dir = [r'/']
-    dirs = {}
-    for line in input_data[1:]:
-        current_dir = current_dir
-
-        if line.startswith('$ cd'):
-            if not line.endswith('..'):
-                current_dir.append(line[5:])
-            else:
-                current_dir.pop()
-
-        if line[0].isdigit():
-            for i in range(1, len(current_dir)+1):
-                try:
-                    dirs[current_dir[-i]].append(line)
-                except KeyError:
-                    dirs[current_dir[-i]] = []
-                    dirs[current_dir[-i]].append(line)
-
-
-totals = []
-for dir, files in dirs.items():
-    sizes = [z.split(' ')[0] for z in files]
-    total_size = sum(int(x) for x in sizes)
-    dirs[dir] = total_size
-    totals.append(total_size)
-
-totals = [a for a in totals if a <= 100000]
-print(sum(totals))
