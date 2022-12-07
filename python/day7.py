@@ -21,7 +21,7 @@ def dir_sizes(directory):
 
 
 def main():
-    root = Directory('/')
+    root = Directory()
     cursor = root
     for line in get_data(7):
         parts = line.split(' ')
@@ -49,13 +49,11 @@ def main():
         if parts[2] == "..":
             cursor = cursor.parent
             continue
-        name = parts[2]
 
-        # directory exists
+        name = parts[2]
         if d := cursor.children.get(name):
             cursor = d
             continue
-
         d = Directory(parent=cursor)
         cursor.children[name] = d
         cursor = d
