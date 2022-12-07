@@ -8,7 +8,7 @@ import (
 )
 
 type directory struct {
-	files    []int
+	size     int
 	parent   *directory
 	children children
 }
@@ -18,7 +18,7 @@ func (d directory) getSizes() (int, []int) {
 	sizes := []int{}
 	var getSize func(directory) int
 	getSize = func(d directory) int {
-		size := helpers.Sum(d.files)
+		size := d.size
 		for _, c := range d.children {
 			size += getSize(*c)
 		}
@@ -48,7 +48,7 @@ func Day7() (string, string) {
 		// file
 		if parts[0] != "$" {
 			size, _ := strconv.Atoi(parts[0])
-			cursor.files = append(cursor.files, size)
+			cursor.size += size
 			continue
 		}
 
