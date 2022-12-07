@@ -38,34 +38,40 @@ func Day7() (string, string) {
 	for scanner.Scan() {
 		line := scanner.Text()
 		parts := strings.Split(line, " ")
-		if parts[0] == "$" {
-			if parts[1] == "cd" {
-				if parts[2] == "/" {
-					cursor = &root
-				} else if parts[2] == ".." {
-					cursor = cursor.parent
-				} else {
-					exists := false
-					for _, dir := range cursor.children {
-						if dir.name == parts[2] {
-							cursor = dir
-							exists = true
-							break
-						}
-					}
-					if !exists {
-						dir := directory{name: parts[2], parent: cursor}
-						cursor.children = append(cursor.children, &dir)
-						cursor = &dir
-					}
-				}
-			}
-		} else if parts[0] == "dir" {
+		if parts[0] == "dir" {
 			dir := directory{name: parts[1], parent: cursor}
 			cursor.children = append(cursor.children, &dir)
-		} else {
+			continue
+		}
+		if parts[0] != "$" {
 			size, _ := strconv.Atoi(parts[0])
 			cursor.files = append(cursor.files, size)
+			continue
+		}
+		if parts[1] == "cd" {
+			if parts[2] == "/" {
+				cursor = &root
+				continue
+			}
+
+			if parts[2] == ".." {
+				cursor = cursor.parent
+				continue
+			}
+
+			exists := false
+			for _, dir := range cursor.children {
+				if dir.name == parts[2] {
+					cursor = dir
+					exists = true
+					break
+				}
+			}
+			if !exists {
+				dir := directory{name: parts[2], parent: cursor}
+				cursor.children = append(cursor.children, &dir)
+				cursor = &dir
+			}
 		}
 	}
 	totalSize, sizes := root.getSizes()
