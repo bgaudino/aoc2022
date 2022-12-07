@@ -3,21 +3,20 @@ from utils import get_data
 
 class Directory:
     def __init__(self, parent=None):
-        self.files = []
+        self.sizeOfFiles = 0
         self.parent = parent
         self.children = {}
 
+    def dir_sizes(self):
+        sizes = []
 
-def dir_sizes(directory):
-    sizes = []
+        def dir_size(dir):
+            size = dir.size
+            size += sum([dir_size(c) for c in dir.children.values()])
+            sizes.append(size)
+            return size
 
-    def dir_size(dir):
-        size = sum(dir.files)
-        size += sum([dir_size(c) for c in dir.children.values()])
-        sizes.append(size)
-        return size
-
-    return dir_size(directory), sizes
+        return dir_size(self), sizes
 
 
 def main():
@@ -35,7 +34,7 @@ def main():
         # file
         if not line.startswith('$'):
             size = int(parts[0])
-            cursor.files.append(size)
+            cursor.sizeOfFiles += size
             continue
 
         # ls
@@ -52,7 +51,7 @@ def main():
             continue
         cursor = cursor.children[pwd]
 
-    total_size, sizes = dir_sizes(root)
+    total_size, sizes = root.dir_sizes()
     available_space = 70000000 - total_size
     space_to_free = 30000000 - available_space
 
