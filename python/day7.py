@@ -49,14 +49,7 @@ def main():
         if parts[2] == "..":
             cursor = cursor.parent
             continue
-
-        name = parts[2]
-        if d := cursor.children.get(name):
-            cursor = d
-            continue
-        d = Directory(parent=cursor)
-        cursor.children[name] = d
-        cursor = d
+        cursor = cursor.children[parts[2]]
 
     total_size, sizes = dir_sizes(root)
     available_space = 70000000 - total_size
