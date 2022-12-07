@@ -25,8 +25,7 @@ func (d directory) getSizes() (int, []int) {
 		sizes = append(sizes, size)
 		return size
 	}
-	size := getSize(d)
-	return size, sizes
+	return getSize(d), sizes
 }
 
 func Day7() (string, string) {
@@ -38,6 +37,7 @@ func Day7() (string, string) {
 	for scanner.Scan() {
 		line := scanner.Text()
 		parts := strings.Split(line, " ")
+
 		// directory
 		if parts[0] == "dir" {
 			dir := directory{parent: cursor, children: make(children)}
@@ -66,14 +66,7 @@ func Day7() (string, string) {
 			cursor = cursor.parent
 			continue
 		}
-		if d, ok := cursor.children[parts[2]]; ok {
-			cursor = d
-			continue
-		}
-		dir := directory{parent: cursor, children: make(children)}
-		cursor.children[parts[2]] = &dir
-		cursor = &dir
-
+		cursor = cursor.children[parts[2]]
 	}
 	totalSize, sizes := root.getSizes()
 	availableSpace := 70000000 - totalSize
