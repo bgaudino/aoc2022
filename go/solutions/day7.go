@@ -8,11 +8,11 @@ import (
 )
 
 type directory struct {
-	name     string
 	files    []int
 	parent   *directory
-	children []*directory
+	children children
 }
+type children map[string]*directory
 
 func (d directory) getSizes() (int, []int) {
 	sizes := []int{}
@@ -33,46 +33,47 @@ func Day7() (string, string) {
 	file, scanner := helpers.GetFile(7)
 	defer file.Close()
 
-	root := directory{name: "/"}
+	root := directory{children: make(children)}
 	cursor := &root
 	for scanner.Scan() {
 		line := scanner.Text()
 		parts := strings.Split(line, " ")
+		// directory
 		if parts[0] == "dir" {
-			dir := directory{name: parts[1], parent: cursor}
-			cursor.children = append(cursor.children, &dir)
+			dir := directory{parent: cursor, children: make(children)}
+			cursor.children[parts[1]] = &dir
 			continue
 		}
+
+		// file
 		if parts[0] != "$" {
 			size, _ := strconv.Atoi(parts[0])
 			cursor.files = append(cursor.files, size)
 			continue
 		}
-		if parts[1] == "cd" {
-			if parts[2] == "/" {
-				cursor = &root
-				continue
-			}
 
-			if parts[2] == ".." {
-				cursor = cursor.parent
-				continue
-			}
-
-			exists := false
-			for _, dir := range cursor.children {
-				if dir.name == parts[2] {
-					cursor = dir
-					exists = true
-					break
-				}
-			}
-			if !exists {
-				dir := directory{name: parts[2], parent: cursor}
-				cursor.children = append(cursor.children, &dir)
-				cursor = &dir
-			}
+		// ls
+		if parts[1] == "ls" {
+			continue
 		}
+
+		// cd
+		if parts[2] == "/" {
+			cursor = &root
+			continue
+		}
+		if parts[2] == ".." {
+			cursor = cursor.parent
+			continue
+		}
+		if d, ok := cursor.children[parts[2]]; ok {
+			cursor = d
+			continue
+		}
+		dir := directory{parent: cursor, children: make(children)}
+		cursor.children[parts[2]] = &dir
+		cursor = &dir
+
 	}
 	totalSize, sizes := root.getSizes()
 	availableSpace := 70000000 - totalSize
