@@ -25,25 +25,33 @@ def main():
     cursor = root
     for line in get_data(7):
         parts = line.split(' ')
+
+        # directory
         if line.startswith('dir'):
             name = parts[-1]
             cursor.children[name] = Directory(parent=cursor)
             continue
+
+        # file
         if not line.startswith('$'):
             size = int(parts[0])
             cursor.files.append(size)
             continue
+
+        # ls
         if line.startswith('$ ls'):
             continue
+
+        # cd
         if parts[2] == "/":
             cursor = root
             continue
         if parts[2] == "..":
             cursor = cursor.parent
             continue
-
-        # cd
         name = parts[2]
+
+        # directory exists
         if d := cursor.children.get(name):
             cursor = d
             continue
