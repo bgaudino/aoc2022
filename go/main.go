@@ -26,6 +26,7 @@ var days = []day{
 	{solutions.Day5, answer{"FJSRQCFTN", "CJVLJQPHS"}},
 	{solutions.Day6, answer{"1912", "2122"}},
 	{solutions.Day7, answer{"1307902", "7068748"}},
+	{solutions.Day8, answer{"1700", "470596"}},
 }
 
 func main() {
