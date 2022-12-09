@@ -8,6 +8,7 @@ import day5
 import day6
 import day7
 import day8
+import day9
 
 
 @dataclass
@@ -25,7 +26,8 @@ days = [
     Day(day5, 'FJSRQCFTN', 'CJVLJQPHS'),
     Day(day6, 1912, 2122),
     Day(day7, 1307902, 7068748),
-    Day(day8, 1700, 470596)
+    Day(day8, 1700, 470596),
+    Day(day9, 6081, 2487)
 ]
 
 total_errors = 0
