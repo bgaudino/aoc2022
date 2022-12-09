@@ -36,23 +36,11 @@ class Knot:
         if self.is_touching():
             return
 
-        if self.is_in_column_of():
+        if not self.is_in_column_of():
+            self.move_left() if self.is_right_of() else self.move_right()
+
+        if not self.is_in_row_of():
             self.move_down() if self.is_above() else self.move_up()
-            return
-
-        if self.is_in_row_of():
-            self.move_right() if self.is_left_of() else self.move_left()
-            return
-
-        if self.is_below():
-            self.move_up()
-            self.move_left() if self.is_right_of() else self.move_right()
-            return
-
-        if self.is_above():
-            self.move_down()
-            self.move_left() if self.is_right_of() else self.move_right()
-            return
 
     def is_in_row_of(self):
         return self.y == self.prev.y
