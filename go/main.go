@@ -27,6 +27,7 @@ var days = []day{
 	{solutions.Day6, answer{"1912", "2122"}},
 	{solutions.Day7, answer{"1307902", "7068748"}},
 	{solutions.Day8, answer{"1700", "470596"}},
+	{solutions.Day9, answer{"6081", "2487"}},
 }
 
 func main() {
@@ -39,4 +40,5 @@ func main() {
 	for _, d := range days {
 		fmt.Println(d.solution())
 	}
+	solutions.Day9()
 }
