@@ -2,20 +2,12 @@ from utils import get_data
 
 
 class Knot:
-    def __init__(self, name, prev=None, next=None):
-        self.name = name
+    def __init__(self, prev=None, next=None):
         self.prev = prev
         self.next = next
         self.x = 0
         self.y = 0
         self.visited = set()
-
-    def __str__(self):
-        return f'({self.x}, {self.y})'
-
-    @property
-    def coordinates(self):
-        return (self.x, self.y)
 
     def move_up(self):
         self.y += 1
@@ -61,38 +53,36 @@ class Knot:
         return self.y < self.prev.y
 
     def add_coordinates(self):
-        self.visited.add(self.coordinates)
+        self.visited.add((self.x, self.y))
 
 
 class Rope:
     start = (0, 0)
 
     def __init__(self, length):
-        self.head = Knot(name='H')
+        self.head = Knot()
         knot = self.head
-        for i in range(1, length):
-            name = 'T' if i == length - 1 else str(i)
-            knot.next = Knot(name=name, prev=knot)
+        for _ in range(1, length):
+            knot.next = Knot(prev=knot)
             knot = knot.next
 
     def process_move(self, move):
-        parts = move.split(' ')
-        direction, distance = self.get_direction(parts[0]), int(parts[1])
-        for _ in range(distance):
-            direction()
+        direction, distance = move.split(' ')
+        for _ in range(int(distance)):
+            match direction:
+                case 'U':
+                    self.head.move_up()
+                case 'D':
+                    self.head.move_down()
+                case 'L':
+                    self.head.move_left()
+                case 'R':
+                    self.head.move_right()
             knot = self.head
             while knot.next is not None:
                 knot.next.follow()
                 knot.next.add_coordinates()
                 knot = knot.next
-
-    def get_direction(self, move):
-        return {
-            'U': self.head.move_up,
-            'D': self.head.move_down,
-            'L': self.head.move_left,
-            'R': self.head.move_right,
-        }[move]
 
     @property
     def tail(self):
