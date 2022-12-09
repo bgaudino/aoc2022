@@ -1,83 +1,92 @@
 package solutions
 
 import (
+	"bufio"
 	"strconv"
 
 	"main.go/go/helpers"
 )
 
+type coordinates struct {
+	x int
+	y int
+}
+
+var north = coordinates{0, -1}
+var south = coordinates{0, 1}
+var east = coordinates{1, 0}
+var west = coordinates{-1, 0}
+
+type tree struct {
+	height      int
+	coordinates coordinates
+}
+
+func (t tree) isVisible(d coordinates, g [][]tree) (bool, int) {
+	isVisible := true
+	scenicScore := 0
+	x, y := t.coordinates.x, t.coordinates.y
+	x += d.x
+	y += d.y
+	for x >= 0 && x < len(g[0]) && y >= 0 && y < len(g) {
+		scenicScore++
+		neighbor := g[y][x]
+		if t.height <= neighbor.height {
+			isVisible = false
+			break
+		}
+		x += d.x
+		y += d.y
+	}
+	return isVisible, scenicScore
+}
+
+type forest struct {
+	grid [][]tree
+}
+
+func (f forest) createGrid(s *bufio.Scanner) [][]tree {
+	grid := [][]tree{}
+	y := 0
+	for s.Scan() {
+		row := []tree{}
+		for x, c := range s.Text() {
+			height, _ := strconv.Atoi(string(c))
+			row = append(row, tree{height, coordinates{x, y}})
+		}
+		grid = append(grid, row)
+		y++
+	}
+	return grid
+}
+
+func (f forest) searchGrid() (string, string) {
+	treesVisibleFromOutside := 0
+	maxScenicScore := 0
+	for _, row := range f.grid {
+		for _, t := range row {
+			northVisible, northCount := t.isVisible(north, f.grid)
+			southVisible, southCount := t.isVisible(south, f.grid)
+			eastVisible, eastCount := t.isVisible(east, f.grid)
+			westVisible, westCount := t.isVisible(west, f.grid)
+
+			if northVisible || southVisible || eastVisible || westVisible {
+				treesVisibleFromOutside++
+			}
+			scenicScore := northCount * southCount * eastCount * westCount
+			if scenicScore > maxScenicScore {
+				maxScenicScore = scenicScore
+			}
+		}
+	}
+	return strconv.Itoa(treesVisibleFromOutside), strconv.Itoa(maxScenicScore)
+}
+
 func Day8() (string, string) {
 	file, scanner := helpers.GetFile(8)
 	defer file.Close()
 
-	rows := []string{}
-	for scanner.Scan() {
-		rows = append(rows, scanner.Text())
-	}
-
-	onEdge := func(x, y int) bool {
-		if x == 0 || y == 0 || x == len(rows[0])-1 || y == len(rows)-1 {
-			return true
-		}
-		return false
-	}
-
-	searchX := func(height int, row string) (bool, int) {
-		isVisible, count := true, 0
-		for _, char := range row {
-			count++
-			neighbor, _ := strconv.Atoi(string(char))
-			if height <= neighbor {
-				isVisible = false
-				break
-			}
-		}
-		return isVisible, count
-	}
-
-	searchY := func(height int, x int, y int, north bool) (bool, int) {
-		isVisible, count, start, stop := true, 0, y, len(rows)
-		if north {
-			stop = -1
-		}
-		for (north && start > stop) || (!north && start < stop) {
-			count++
-			neighbor, _ := strconv.Atoi(string(rows[start][x]))
-			if height <= neighbor {
-				isVisible = false
-				break
-			}
-			if north {
-				start--
-			} else {
-				start++
-			}
-		}
-		return isVisible, count
-	}
-
-	maxTreeCount, numVisible := 0, 0
-	for y, row := range rows {
-		for x, h := range row {
-			height, _ := strconv.Atoi(string(h))
-			northVisible, northCount := searchY(height, x, y-1, true)
-			southVisible, southCount := searchY(height, x, y+1, false)
-			eastVisible, eastCount := searchX(height, row[x+1:])
-
-			bs := []byte{}
-			for i := x - 1; i >= 0; i-- {
-				bs = append(bs, row[i])
-			}
-			westVisible, westCount := searchX(height, string(bs))
-
-			count := northCount * southCount * eastCount * westCount
-			if count > maxTreeCount {
-				maxTreeCount = count
-			}
-			if onEdge(x, y) || northVisible || southVisible || eastVisible || westVisible {
-				numVisible++
-			}
-		}
-	}
-	return strconv.Itoa(numVisible), strconv.Itoa(maxTreeCount)
+	f := forest{}
+	f.grid = f.createGrid(scanner)
+	return f.searchGrid()
 }
