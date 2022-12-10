@@ -28,18 +28,34 @@ var days = []day{
 	{solutions.Day7, answer{"1307902", "7068748"}},
 	{solutions.Day8, answer{"1700", "470596"}},
 	{solutions.Day9, answer{"6081", "2487"}},
-	{solutions.Day10, answer{"", ""}},
+	{solutions.Day10, answer{"13740", solutions.Day10part2Answer}},
 }
 
 func main() {
 	args := os.Args
 	if len(args) > 1 {
 		n, _ := strconv.Atoi(args[1])
-		fmt.Println(days[n-1].solution())
+		run(n, days[n-1])
 		return
 	}
-	for _, d := range days {
-		fmt.Println(d.solution())
+	for i, d := range days {
+		run(i+1, d)
 	}
 	solutions.Day9()
+}
+
+func run(n int, d day) {
+	s := d.solution
+	p1, p2 := s()
+	fmt.Println("--Day", n, "--")
+	fmt.Println()
+	fmt.Println("Part 1")
+	fmt.Println("------")
+	fmt.Println(p1)
+	fmt.Println()
+	fmt.Println("Part 2")
+	fmt.Println("------")
+	fmt.Println(p2)
+	fmt.Println()
+	fmt.Println()
 }
