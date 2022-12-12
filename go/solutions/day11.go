@@ -28,12 +28,12 @@ func (m *monkey) getBored() {
 	m.items[0] /= 3
 }
 
-func (m monkey) test(item int) bool {
-	return item%m.modulus == 0
+func (m monkey) test() bool {
+	return m.items[0]%m.modulus == 0
 }
 
 func (m monkey) toMonkeyIndex() int {
-	if m.test(m.items[0]) {
+	if m.test() {
 		return m.ifTrue
 	}
 	return m.ifFalse
@@ -144,7 +144,7 @@ func getTroop() []monkey {
 }
 
 func parseItems(itemStr string) []int {
-	itemSlice := strings.Split(strings.Trim(itemStr, ""), ",")
+	itemSlice := strings.Split(strings.Trim(itemStr, " "), ",")
 	items := []int{}
 	for _, is := range itemSlice {
 		item, err := strconv.Atoi(strings.Trim(is, " "))
