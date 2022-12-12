@@ -36,8 +36,14 @@ class CRT:
         return self.cycle * self.register
 
     @property
+    def sprite_position(self):
+        middle = self.register
+        return (middle - 1, middle, middle + 1)
+
+    @property
     def sprite_visible(self):
-        return abs((self.cycle % self.row_length - 1) - self.register) < 2
+        # There's definitely a better way to do this
+        return len(self.rows[-1]) in self.sprite_position or (0 in self.sprite_position and len(self.rows[-1]) == self.row_length)
 
     def print(self):
         for row in self.rows:
