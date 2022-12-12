@@ -13,7 +13,7 @@ import (
 type monkey struct {
 	items           []int
 	operation       func(int) int
-	test            func(int) bool
+	modulus         int
 	ifTrue          int
 	ifFalse         int
 	inspectionCount int
@@ -26,6 +26,10 @@ func (m *monkey) inspect() {
 
 func (m *monkey) getBored() {
 	m.items[0] /= 3
+}
+
+func (m monkey) test(item int) bool {
+	return item%m.modulus == 0
 }
 
 func (m monkey) toMonkeyIndex() int {
@@ -49,28 +53,49 @@ func (m *monkey) catch(item int) {
 	m.items = append(m.items, item)
 }
 
-func Day11() {
-	troop := getMonkeys()
-
+func Day11() (string, string) {
+	t1 := getTroop()
 	for i := 0; i < 20; i++ {
-		completeRound(troop)
+		completeRound(t1, 1)
 	}
-	mostActive := mostActiveMonkeys(troop)
-	fmt.Println(mostActive[0].inspectionCount * mostActive[1].inspectionCount)
+
+	t2 := getTroop()
+	for i := 0; i < 10000; i++ {
+		completeRound(t2, 2)
+	}
+
+	p1, p2 := getMonkeyBusiness(t1), getMonkeyBusiness(t2)
+	return strconv.Itoa(p1), strconv.Itoa((p2))
 }
 
-func completeRound(troop []monkey) {
+func completeRound(troop []monkey, part int) {
 	for i := 0; i < len(troop); i++ {
 		fromMonkey := &troop[i]
 		for len(fromMonkey.items) > 0 {
 			fromMonkey.inspect()
-			fromMonkey.getBored()
+			if part == 1 {
+				fromMonkey.getBored()
+			} else if part == 2 {
+				fromMonkey.items[0] = fromMonkey.items[0] % cycleLength(troop)
+			} else {
+				fmt.Println("Invalid argument. Part must be 1 or 2")
+				os.Exit(1)
+			}
 			j := fromMonkey.toMonkeyIndex()
 			toMonkey := &troop[j]
 			item := fromMonkey.throw()
 			toMonkey.catch(item)
 		}
 	}
+}
+
+func getMonkeyBusiness(troop []monkey) int {
+	level := 1
+	mostActive := mostActiveMonkeys(troop)
+	for _, m := range mostActive {
+		level *= m.inspectionCount
+	}
+	return level
 }
 
 func mostActiveMonkeys(troop []monkey) []monkey {
@@ -80,7 +105,16 @@ func mostActiveMonkeys(troop []monkey) []monkey {
 	return troop[:2]
 }
 
-func getMonkeys() []monkey {
+func cycleLength(troop []monkey) int {
+	product := 1
+	for _, m := range troop {
+
+		product *= m.modulus
+	}
+	return product
+}
+
+func getTroop() []monkey {
 	file, scanner := helpers.GetFile(11)
 	defer file.Close()
 
@@ -95,7 +129,7 @@ func getMonkeys() []monkey {
 		case "Operation":
 			m.operation = parseOperation(parts[1])
 		case "Test":
-			m.test = parseTest(parts[1])
+			m.modulus = parseModulus(parts[1])
 		case "If true":
 			m.ifTrue = parseCondition(parts[1])
 		case "If false":
@@ -159,14 +193,14 @@ func parseOperation(operStr string) (o func(int) int) {
 	return
 }
 
-func parseTest(testString string) func(int) bool {
+func parseModulus(testString string) int {
 	parts := strings.Split(testString, " ")
-	value, err := strconv.Atoi(parts[len(parts)-1])
+	modulus, err := strconv.Atoi(parts[len(parts)-1])
 	if err != nil {
-		fmt.Println("Could not convert test value to int:", value)
+		fmt.Println("Could not convert test value to int:", modulus)
 		os.Exit(1)
 	}
-	return func(old int) bool { return old%value == 0 }
+	return modulus
 }
 
 func parseCondition(conditionString string) int {
