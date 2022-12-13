@@ -12,6 +12,7 @@ import day9
 import day10
 import day11
 import day12
+import day13
 
 
 @dataclass
@@ -34,6 +35,7 @@ days = [
     Day(day10, 13740, day10.part2_answer),
     Day(day11, 61005, 20567144694),
     Day(day12, 412, 402),
+    Day(day13, 6070, 20758)
 ]
 
 total_errors = 0
