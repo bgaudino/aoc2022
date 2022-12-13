@@ -30,6 +30,7 @@ var days = []day{
 	{solutions.Day9, answer{"6081", "2487"}},
 	{solutions.Day10, answer{"13740", solutions.Day10part2Answer}},
 	{solutions.Day11, answer{"61005", "20567144694"}},
+	{solutions.Day12, answer{"412", "402"}},
 }
 
 func main() {
@@ -42,7 +43,6 @@ func main() {
 	for i, d := range days {
 		run(i+1, d)
 	}
-	solutions.Day9()
 }
 
 func run(n int, d day) {
