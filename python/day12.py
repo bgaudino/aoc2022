@@ -43,26 +43,21 @@ class HeightMap:
         return points
 
     def bfs(self, start=None):
-        if start is None:
-            start = self.start
+        visited = {start or self.start}
+        queue = [(start or self.start, -1)]
 
-        visited = {start}
-        queue = [(start, -1)]
-
-        found = False
         while queue:
             current, steps = queue.pop(0)
             steps += 1
             if current == self.end:
-                found = True
-                break
+                return steps
 
             for edge in self.get_edges_from(*current):
                 if edge not in visited:
                     visited.add(edge)
                     queue.append((edge, steps))
 
-        return steps if found else -1
+        return -1
 
 
 def main():
