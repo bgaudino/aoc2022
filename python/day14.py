@@ -131,10 +131,10 @@ def main():
     cave_with_abyss = Cave(paths)
     cave_with_abyss.fall()
 
-    cave_with_infinie_floor = Cave(paths, has_infinite_floor=True)
-    cave_with_infinie_floor.fall()
+    cave_with_infinite_floor = Cave(paths, has_infinite_floor=True)
+    cave_with_infinite_floor.fall()
 
-    return len(cave_with_abyss.sand), len(cave_with_infinie_floor.sand)
+    return len(cave_with_abyss.sand), len(cave_with_infinite_floor.sand)
 
 
 def parse_path(path):
