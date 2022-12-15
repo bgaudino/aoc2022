@@ -1,5 +1,4 @@
 from utils import get_data
-from time import sleep
 
 
 class Cave:
