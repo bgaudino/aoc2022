@@ -1,9 +1,9 @@
 package main
 
 import (
-
-	// "os"
-	// "strconv"
+	"fmt"
+	"os"
+	"strconv"
 
 	"main.go/go/solutions"
 )
@@ -31,24 +31,33 @@ var days = []day{
 	{solutions.Day10, answer{"13740", solutions.Day10part2Answer}},
 	{solutions.Day11, answer{"61005", "20567144694"}},
 	{solutions.Day12, answer{"412", "402"}},
+	{solutions.Day15, answer{"4582667", "10961118625406"}},
 }
 
 func main() {
-	solutions.Day15()
+	args := os.Args
+	if len(args) > 1 {
+		n, _ := strconv.Atoi(args[1])
+		run(n, days[n-1])
+		return
+	}
+	for i, d := range days {
+		run(i+1, d)
+	}
 }
 
-// func run(n int, d day) {
-// 	s := d.solution
-// 	p1, p2 := s()
-// 	fmt.Println("--Day", n, "--")
-// 	fmt.Println()
-// 	fmt.Println("Part 1")
-// 	fmt.Println("------")
-// 	fmt.Println(p1)
-// 	fmt.Println()
-// 	fmt.Println("Part 2")
-// 	fmt.Println("------")
-// 	fmt.Println(p2)
-// 	fmt.Println()
-// 	fmt.Println()
-// }
+func run(n int, d day) {
+	s := d.solution
+	p1, p2 := s()
+	fmt.Println("--Day", n, "--")
+	fmt.Println()
+	fmt.Println("Part 1")
+	fmt.Println("------")
+	fmt.Println(p1)
+	fmt.Println()
+	fmt.Println("Part 2")
+	fmt.Println("------")
+	fmt.Println(p2)
+	fmt.Println()
+	fmt.Println()
+}

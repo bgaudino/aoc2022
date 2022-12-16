@@ -10,13 +10,12 @@ import (
 	"main.go/go/helpers"
 )
 
-type Sensor struct {
-	coordinates
-	sweep int
-}
-
 type coordinatesSet map[coordinates]bool
 type coordinatePairs map[coordinates]coordinates
+type yRange struct {
+	start int
+	stop  int
+}
 
 const SEARCH_AREA_SIZE = 4000000
 
@@ -30,15 +29,16 @@ func tuningFrequency(c coordinates) int {
 	return (c.x * SEARCH_AREA_SIZE) + c.y
 }
 
-func isEmpty(sensor coordinates, position coordinates, sensors coordinatesSet, beacons coordinatesSet, pairs coordinatePairs) bool {
+func isOutOfBounds(c coordinates) bool {
+	return c.x < 0 || c.y < 0 || c.x > SEARCH_AREA_SIZE || c.y > SEARCH_AREA_SIZE
+}
+
+func isEmpty(sensor coordinates, position coordinates, sensors coordinatesSet, beacons coordinatesSet, sensorBeaconPairs coordinatePairs) bool {
 	if beacons[position] || sensors[position] {
 		return false
 	}
-	if position.x < 0 || position.y < 0 || position.x > SEARCH_AREA_SIZE || position.y > SEARCH_AREA_SIZE {
-		return false
-	}
 	for s := range sensors {
-		sensorRange := manhattanDistance(s, pairs[s])
+		sensorRange := manhattanDistance(s, sensorBeaconPairs[s])
 		distanceToSensor := manhattanDistance(s, position)
 		if sensorRange >= distanceToSensor {
 			return false
@@ -47,63 +47,94 @@ func isEmpty(sensor coordinates, position coordinates, sensors coordinatesSet, b
 	return true
 }
 
-func Day15() {
-	sensors, beacons, pairs := parse()
+func Day15() (string, string) {
+	sensors, beacons, sensorBeaconPairs := parse()
 	targetRow := 2000000
-	columnRanges := [][]int{}
+	columnRanges := make(map[yRange]bool)
 
 	// Part 1
-	for s, b := range pairs {
-		distanceToBeacon := manhattanDistance(s, b)
-		distanceToRow := manhattanDistance(s, coordinates{s.x, targetRow})
+	currentRange := yRange{0, 0}
+	for sensor, beacon := range sensorBeaconPairs {
+		distanceToBeacon := manhattanDistance(sensor, beacon)
+		distanceToRow := manhattanDistance(sensor, coordinates{sensor.x, targetRow})
 		if distanceToRow > distanceToBeacon {
 			continue
 		}
-		offset := int(math.Abs(float64(s.y) - float64(targetRow)))
-		columnRange := []int{s.x - distanceToBeacon + offset, s.x + distanceToBeacon - offset}
-		columnRanges = append(columnRanges, columnRange)
+		offset := int(math.Abs(float64(sensor.y) - float64(targetRow)))
+		columnRange := yRange{sensor.x - distanceToBeacon + offset, sensor.x + distanceToBeacon - offset}
+
+		// Don't overlap
+		if columnRange.start > currentRange.stop || columnRange.stop < currentRange.start {
+			columnRanges[currentRange] = true
+			currentRange = columnRange
+			continue
+		}
+
+		// Extends right
+		if columnRange.stop > currentRange.stop {
+			currentRange.stop = columnRange.stop
+		}
+
+		// Extends left
+		if columnRange.start < currentRange.start {
+			currentRange.start = columnRange.start
+		}
 	}
+	columnRanges[currentRange] = true
 
 	eliminated := make(coordinatesSet)
-	for _, cr := range columnRanges {
-		for i := cr[0]; i <= cr[1]; i++ {
+	for cr := range columnRanges {
+		for i := cr.start; i <= cr.stop; i++ {
 			c := coordinates{i, targetRow}
 			if !beacons[c] && !sensors[c] {
 				eliminated[c] = true
 			}
 		}
 	}
-	fmt.Println(len(eliminated))
+	numSquaresWithNoBeacon := len(eliminated)
 
 	// Part 2
-	signal := findSignal(sensors, beacons, pairs)
-	if signal != nil {
-		fmt.Println(tuningFrequency(*signal))
+	signal := findSignal(sensors, beacons, sensorBeaconPairs)
+	if signal == nil {
+		fmt.Println("Oops")
+		os.Exit(1)
 	}
+	frequency := tuningFrequency(*signal)
+
+	return strconv.Itoa(numSquaresWithNoBeacon), strconv.Itoa(frequency)
 }
 
-func findSignal(sensors coordinatesSet, beacons coordinatesSet, pairs coordinatePairs) *coordinates {
+func findSignal(sensors coordinatesSet, beacons coordinatesSet, sensorBeaconPairs coordinatePairs) *coordinates {
 	for sensor := range sensors {
-		distance := manhattanDistance(sensor, pairs[sensor]) + 1
+		distance := manhattanDistance(sensor, sensorBeaconPairs[sensor]) + 1
+		start := sensor.x + 1
+		if start < 0 {
+			start = 0
+		}
+		end := sensor.x + distance
+		if end > SEARCH_AREA_SIZE {
+			end = SEARCH_AREA_SIZE
+		}
 		for x := sensor.x + 1; x <= sensor.x+distance; x++ {
 			offset := int(math.Abs(float64(x) - float64(sensor.x)))
 			top := coordinates{x, sensor.y - distance + offset}
 			bottom := coordinates{x, sensor.y + distance - offset}
-			if isEmpty(sensor, top, sensors, beacons, pairs) {
+			if !isOutOfBounds(top) && isEmpty(sensor, top, sensors, beacons, sensorBeaconPairs) {
 				return &top
 			}
-			if isEmpty(sensor, bottom, sensors, beacons, pairs) {
+			if !isOutOfBounds(bottom) && isEmpty(sensor, bottom, sensors, beacons, sensorBeaconPairs) {
 				return &bottom
 			}
+
 		}
 		for x := sensor.x - 1; x >= sensor.x-distance; x-- {
 			offset := int(math.Abs(float64(x) - float64(sensor.x)))
 			top := coordinates{x, sensor.y - distance + offset}
 			bottom := coordinates{x, sensor.y + distance - offset}
-			if isEmpty(sensor, top, sensors, beacons, pairs) {
+			if !isOutOfBounds(top) && isEmpty(sensor, top, sensors, beacons, sensorBeaconPairs) {
 				return &top
 			}
-			if isEmpty(sensor, bottom, sensors, beacons, pairs) {
+			if !isOutOfBounds(bottom) && isEmpty(sensor, bottom, sensors, beacons, sensorBeaconPairs) {
 				return &bottom
 			}
 		}
