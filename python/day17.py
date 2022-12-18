@@ -54,27 +54,34 @@ class Square(Rock):
 
 
 class Tower:
-    rock_pattern = (HorizontalLine, Plus, L, VerticalLine, Square)
+    rocks = (HorizontalLine, Plus, L, VerticalLine, Square)
     width = 7
     start_x = 2
     start_y = 3
-    rock_index = 0
-    gas_jet = 0
+    rock_count = 0
+    jet_count = 0
 
     def __init__(self):
         self.taken = set()
-        self.states = set()
-        self.gas_jet_directions = ''.join(get_data(17))
+        self.states = {}
+        self.jet_directions = ''.join(get_data(17))
+
+    @property
+    def rock_index(self):
+        return self.rock_count % len(self.rocks)
+
+    @property
+    def jet_index(self):
+        return self.jet_count % len(self.jet_directions)
 
     def get_rock(self):
-        rock = self.rock_pattern[self.rock_index % len(self.rock_pattern)]()
-        self.rock_index += 1
+        rock = self.rocks[self.rock_index]()
+        self.rock_count += 1
         return rock
 
-    def get_instruction(self):
-        direction = self.gas_jet_directions[self.gas_jet % len(
-            self.gas_jet_directions)]
-        self.gas_jet += 1
+    def get_jet_instruction(self):
+        direction = self.jet_directions[self.jet_index]
+        self.jet_count += 1
         return direction
 
     def is_taken(self, rock):
@@ -91,13 +98,24 @@ class Tower:
             return 0
         return max((y for _, y in self.taken)) + 1
 
+    def surface_profile(self):
+        profile = []
+        for x in range(self.width):
+            y = self.height()
+            while (x, y) not in self.taken:
+                y -= 1
+                if y < 0:
+                    break
+            profile.append(self.height() - (y + 1))
+        return tuple(profile)
+
     def fall(self):
         rock = self.get_rock()
         rock.right(self.start_x)
         rock.up(self.height() + self.start_y)
 
         while True:
-            instruction = self.get_instruction()
+            instruction = self.get_jet_instruction()
             if instruction == '>':
                 rock.right()
                 if self.is_taken(rock):
@@ -113,6 +131,47 @@ class Tower:
                 rock.up()
                 self.taken = self.taken.union(rock.coordinates)
                 break
+
+        return (
+            self.surface_profile(),
+            self.rock_index,
+            self.jet_index,
+        )
+
+    def run(self, iterations):
+        tower = Tower()
+
+        # Find cycle
+        for i in range(iterations):
+            state = tower.fall()
+            if state in self.states:
+                cycle_start, cycle_stop = self.states[state], i
+                break
+            self.states[state] = i
+        else:
+            # If no cycle return height
+            return self.height()
+
+        # Get height before cycle starts
+        tower = Tower()
+        for i in range(cycle_start):
+            tower.fall()
+        pre_cycle_height = tower.height()
+
+        # Get cycle height
+        cycle_length = cycle_stop - cycle_start
+        for i in range(cycle_length):
+            tower.fall()
+        cycle_height = tower.height() - pre_cycle_height
+
+        # Get height after last cycle
+        remainder = (iterations - cycle_start) % cycle_length
+        for i in range(remainder):
+            tower.fall()
+        remainder_height = tower.height() - pre_cycle_height - cycle_height
+
+        complete_cycle_height = cycle_height * ((iterations - cycle_start) // cycle_length)
+        return pre_cycle_height + complete_cycle_height+ remainder_height
 
     def print(self, rock=None):
         chamber = ['+-------+']
@@ -134,8 +193,9 @@ class Tower:
             print(''.join(row))
 
 
-tower = Tower()
-for i in range(2022):
-    tower.fall()
-tower.print()
-print(tower.height())
+def main():
+    return Tower().run(2022), Tower().run(1000000000000)
+
+
+if __name__ == '__main__':
+    print(main())
