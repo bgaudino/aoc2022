@@ -107,14 +107,6 @@ func Day15() (string, string) {
 func findSignal(sensors coordinatesSet, beacons coordinatesSet, sensorBeaconPairs coordinatePairs) *coordinates {
 	for sensor := range sensors {
 		distance := manhattanDistance(sensor, sensorBeaconPairs[sensor]) + 1
-		start := sensor.x + 1
-		if start < 0 {
-			start = 0
-		}
-		end := sensor.x + distance
-		if end > SEARCH_AREA_SIZE {
-			end = SEARCH_AREA_SIZE
-		}
 		for x := sensor.x + 1; x <= sensor.x+distance; x++ {
 			offset := int(math.Abs(float64(x) - float64(sensor.x)))
 			top := coordinates{x, sensor.y - distance + offset}
