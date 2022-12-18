@@ -23,16 +23,16 @@ class HorizontalLine(Rock):
 
 class Plus(Rock):
     coordinates = {
-        (1, 2),
+                (1, 2),
         (0, 1), (1, 1), (2, 1),
-        (1, 0),
+                (1, 0),
     }
 
 
 class L(Rock):
     coordinates = {
-        (2, 2),
-        (2, 1),
+                        (2, 2),
+                        (2, 1),
         (0, 0), (1, 0), (2, 0),
     }
 
@@ -93,26 +93,28 @@ class Tower:
             return True
         return False
 
+    @property
     def height(self):
         if not self.taken:
             return 0
         return max((y for _, y in self.taken)) + 1
 
+    @property
     def surface_profile(self):
         profile = []
         for x in range(self.width):
-            y = self.height()
+            y = self.height
             while (x, y) not in self.taken:
                 y -= 1
                 if y < 0:
                     break
-            profile.append(self.height() - (y + 1))
+            profile.append(self.height - (y + 1))
         return tuple(profile)
 
     def fall(self):
         rock = self.get_rock()
         rock.right(self.start_x)
-        rock.up(self.height() + self.start_y)
+        rock.up(self.height + self.start_y)
 
         while True:
             instruction = self.get_jet_instruction()
@@ -133,50 +135,15 @@ class Tower:
                 break
 
         return (
-            self.surface_profile(),
+            self.surface_profile,
             self.rock_index,
             self.jet_index,
         )
 
-    def run(self, iterations):
-        tower = Tower()
-
-        # Find cycle
-        for i in range(iterations):
-            state = tower.fall()
-            if state in self.states:
-                cycle_start, cycle_stop = self.states[state], i
-                break
-            self.states[state] = i
-        else:
-            # If no cycle return height
-            return self.height()
-
-        # Get height before cycle starts
-        tower = Tower()
-        for i in range(cycle_start):
-            tower.fall()
-        pre_cycle_height = tower.height()
-
-        # Get cycle height
-        cycle_length = cycle_stop - cycle_start
-        for i in range(cycle_length):
-            tower.fall()
-        cycle_height = tower.height() - pre_cycle_height
-
-        # Get height after last cycle
-        remainder = (iterations - cycle_start) % cycle_length
-        for i in range(remainder):
-            tower.fall()
-        remainder_height = tower.height() - pre_cycle_height - cycle_height
-
-        complete_cycle_height = cycle_height * ((iterations - cycle_start) // cycle_length)
-        return pre_cycle_height + complete_cycle_height+ remainder_height
-
     def print(self, rock=None):
         chamber = ['+-------+']
 
-        for y in range(0, self.height() + 4):
+        for y in range(0, self.height + 4):
             row = ['|']
             for x in range(self.width):
                 if rock and (x, y) in rock.coordinates:
@@ -193,8 +160,34 @@ class Tower:
             print(''.join(row))
 
 
+def drop_rocks(iterations):
+    tower = Tower()
+
+    # Find cycle
+    for i in range(iterations):
+        state = tower.fall()
+        if state in tower.states:
+            cycle_start, pre_cycle_height = tower.states[state]
+            cycle_length = i - cycle_start
+            cycle_height = tower.height - pre_cycle_height
+            break
+        tower.states[state] = (i, tower.height)
+    else:
+        # If no cycle return height
+        return tower.height
+
+    # Get height after last cycle
+    remainder = (iterations - cycle_start) % cycle_length
+    for i in range(remainder):
+        tower.fall()
+    remainder_height = tower.height - pre_cycle_height - cycle_height
+
+    num_cycles = (iterations - cycle_start) // cycle_length
+    return pre_cycle_height + (cycle_height * num_cycles) + remainder_height
+
+
 def main():
-    return Tower().run(2022), Tower().run(1000000000000)
+    return drop_rocks(2022), drop_rocks(1000000000000)
 
 
 if __name__ == '__main__':
