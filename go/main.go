@@ -5,49 +5,52 @@ import (
 	"os"
 	"strconv"
 
-	"main.go/go/solutions"
+	"main.go/go/helpers"
+	"main.go/go/solutions/day01"
+	"main.go/go/solutions/day02"
+	"main.go/go/solutions/day03"
+	"main.go/go/solutions/day04"
+	"main.go/go/solutions/day05"
+	"main.go/go/solutions/day06"
+	"main.go/go/solutions/day07"
+	"main.go/go/solutions/day08"
+	"main.go/go/solutions/day09"
+	"main.go/go/solutions/day10"
+	"main.go/go/solutions/day11"
+	"main.go/go/solutions/day12"
+	"main.go/go/solutions/day15"
 )
 
-type solution func() (string, string)
-type answer struct {
-	part1 string
-	part2 string
-}
-type day struct {
-	solution solution
-	answer   answer
-}
-
-var days = []day{
-	{solutions.Day1, answer{"72070", "211805"}},
-	{solutions.Day2, answer{"14297", "10498"}},
-	{solutions.Day3, answer{"7826", "2577"}},
-	{solutions.Day4, answer{"424", "804"}},
-	{solutions.Day5, answer{"FJSRQCFTN", "CJVLJQPHS"}},
-	{solutions.Day6, answer{"1912", "2122"}},
-	{solutions.Day7, answer{"1307902", "7068748"}},
-	{solutions.Day8, answer{"1700", "470596"}},
-	{solutions.Day9, answer{"6081", "2487"}},
-	{solutions.Day10, answer{"13740", solutions.Day10part2Answer}},
-	{solutions.Day11, answer{"61005", "20567144694"}},
-	{solutions.Day12, answer{"412", "402"}},
-	{solutions.Day15, answer{"4582667", "10961118625406"}},
+var Days = []helpers.Day{
+	day01.Day,
+	day02.Day,
+	day03.Day,
+	day04.Day,
+	day05.Day,
+	day06.Day,
+	day07.Day,
+	day08.Day,
+	day09.Day,
+	day10.Day,
+	day11.Day,
+	day12.Day,
+	day15.Day,
 }
 
 func main() {
 	args := os.Args
 	if len(args) > 1 {
 		n, _ := strconv.Atoi(args[1])
-		run(n, days[n-1])
+		run(n, Days[n-1])
 		return
 	}
-	for i, d := range days {
+	for i, d := range Days {
 		run(i+1, d)
 	}
 }
 
-func run(n int, d day) {
-	s := d.solution
+func run(n int, d helpers.Day) {
+	s := d.Solution
 	p1, p2 := s()
 	fmt.Println("--Day", n, "--")
 	fmt.Println()

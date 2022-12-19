@@ -1,4 +1,4 @@
-package solutions
+package day06
 
 import (
 	"strconv"
@@ -19,7 +19,7 @@ func (ds datastream) findMarker(n int) string {
 	return ""
 }
 
-func Day6() (string, string) {
+func Solution() (string, string) {
 	file, scanner := helpers.GetFile(6)
 	defer file.Close()
 	scanner.Scan()
@@ -38,3 +38,5 @@ func isUnique(s string) bool {
 	}
 	return true
 }
+
+var Day = helpers.Day{Solution: Solution, Answer: helpers.Answer{Part1: "1912", Part2: "2122"}}

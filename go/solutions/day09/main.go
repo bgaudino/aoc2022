@@ -1,4 +1,4 @@
-package solutions
+package day09
 
 import (
 	"strconv"
@@ -7,42 +7,39 @@ import (
 	"main.go/go/helpers"
 )
 
-type position struct {
-	x int
-	y int
-}
+type coordinates helpers.Coordinates
 
 type knot struct {
-	position
+	coordinates
 	next    *knot
-	visited map[position]bool
+	visited map[coordinates]bool
 }
 
 func (k knot) isTouching(h knot) bool {
-	return !(k.x > h.x+1 || k.x < h.x-1 || k.y > h.y+1 || k.y < h.y-1)
+	return !(k.X > h.X+1 || k.X < h.X-1 || k.Y > h.Y+1 || k.Y < h.Y-1)
 }
 
 func (k *knot) follow(h knot) {
 	if k.isTouching(h) {
 		return
 	}
-	if k.x != h.x {
-		if k.x > h.x {
-			k.x--
+	if k.X != h.X {
+		if k.X > h.X {
+			k.X--
 		} else {
-			k.x++
+			k.X++
 		}
 	}
-	if k.y != h.y {
-		if k.y > h.y {
-			k.y--
+	if k.Y != h.Y {
+		if k.Y > h.Y {
+			k.Y--
 		} else {
-			k.y++
+			k.Y++
 		}
 	}
 }
 
-func Day9() (string, string) {
+func Solution() (string, string) {
 	file, scanner := helpers.GetFile(9)
 	defer file.Close()
 
@@ -56,10 +53,10 @@ func Day9() (string, string) {
 }
 
 func move(instructions []string, ropeLength int) int {
-	head := knot{visited: make(map[position]bool)}
+	head := knot{visited: make(map[coordinates]bool)}
 	tail := &head
 	for i := 1; i < ropeLength; i++ {
-		tail.next = &knot{visited: make(map[position]bool)}
+		tail.next = &knot{visited: make(map[coordinates]bool)}
 		tail = tail.next
 	}
 
@@ -71,21 +68,23 @@ func move(instructions []string, ropeLength int) int {
 		for i := 0; i < distance; i++ {
 			switch movement {
 			case "U":
-				head.y++
+				head.Y++
 			case "D":
-				head.y--
+				head.Y--
 			case "L":
-				head.x--
+				head.X--
 			case "R":
-				head.x++
+				head.X++
 			}
 			k := &head
 			for k.next != nil {
 				k.next.follow(*k)
 				k = k.next
-				tail.visited[tail.position] = true
+				tail.visited[tail.coordinates] = true
 			}
 		}
 	}
 	return len(tail.visited)
 }
+
+var Day = helpers.Day{Solution: Solution, Answer: helpers.Answer{Part1: "6081", Part2: "2487"}}

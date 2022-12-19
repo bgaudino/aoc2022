@@ -1,4 +1,4 @@
-package solutions
+package day05
 
 import (
 	"strconv"
@@ -7,7 +7,7 @@ import (
 	"main.go/go/helpers"
 )
 
-func Day5() (string, string) {
+func Solution() (string, string) {
 	diagram, instructions := parseInput()
 
 	// Part 1
@@ -98,3 +98,5 @@ func topOfEachStack(stacks map[string][]string) string {
 	}
 	return strings.Join(tops, "")
 }
+
+var Day = helpers.Day{Solution: Solution, Answer: helpers.Answer{Part1: "FJSRQCFTN", Part2: "CJVLJQPHS"}}

@@ -1,4 +1,4 @@
-package solutions
+package day03
 
 import (
 	"strconv"
@@ -59,7 +59,7 @@ func (g group) badge() item {
 	return rucksack.pop()
 }
 
-func Day3() (string, string) {
+func Solution() (string, string) {
 	file, scanner := helpers.GetFile(3)
 	defer file.Close()
 
@@ -89,3 +89,5 @@ func Day3() (string, string) {
 
 	return strconv.Itoa(p1), strconv.Itoa(p2)
 }
+
+var Day = helpers.Day{Solution: Solution, Answer: helpers.Answer{Part1: "7826", Part2: "2577"}}

@@ -1,4 +1,4 @@
-package solutions
+package day02
 
 import (
 	"strconv"
@@ -14,7 +14,7 @@ var elfCodes = map[string]int{"A": rock, "B": paper, "C": scissors}
 var myCodes = map[string]int{"X": rock, "Y": paper, "Z": scissors}
 var outcomeCodes = map[string]int{"X": loss, "Y": draw, "Z": win}
 
-func Day2() (string, string) {
+func Solution() (string, string) {
 	file, scanner := helpers.GetFile(2)
 	defer file.Close()
 
@@ -54,3 +54,5 @@ func getShapePointsByOutcome(s int, o int) int {
 	}
 	return s - 1
 }
+
+var Day = helpers.Day{Solution: Solution, Answer: helpers.Answer{Part1: "14297", Part2: "10498"}}

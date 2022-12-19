@@ -1,4 +1,4 @@
-package solutions
+package day10
 
 import (
 	"fmt"
@@ -83,7 +83,7 @@ func parseInstruction(i string) (string, int) {
 	return operation, value
 }
 
-func Day10() (string, string) {
+func Solution() (string, string) {
 	file, scanner := helpers.GetFile(10)
 	defer file.Close()
 
@@ -100,9 +100,11 @@ func Day10() (string, string) {
 	return strconv.Itoa(c.sumOfSignalStrengths), c.toString()
 }
 
-var Day10part2Answer = `####.#..#.###..###..####.####..##..#....
+var part2Answer = `####.#..#.###..###..####.####..##..#....
 ...#.#..#.#..#.#..#.#....#....#..#.#....
 ..#..#..#.#..#.#..#.###..###..#....#....
 .#...#..#.###..###..#....#....#....#....
 #....#..#.#....#.#..#....#....#..#.#....
 ####..##..#....#..#.#....####..##..####.`
+
+var Day = helpers.Day{Solution: Solution, Answer: helpers.Answer{Part1: "13740", Part2: part2Answer}}

@@ -1,4 +1,4 @@
-package solutions
+package day08
 
 import (
 	"bufio"
@@ -7,27 +7,24 @@ import (
 	"main.go/go/helpers"
 )
 
-type coordinates struct {
-	x int
-	y int
-}
+type coordinates helpers.Coordinates
 
-var north = coordinates{0, -1}
-var south = coordinates{0, 1}
-var east = coordinates{1, 0}
-var west = coordinates{-1, 0}
+var north = coordinates{X: 0, Y: -1}
+var south = coordinates{X: 0, Y: 1}
+var east = coordinates{X: 1, Y: 0}
+var west = coordinates{X: -1, Y: 0}
 
 type tree struct {
-	height      int
-	coordinates coordinates
+	height int
+	coordinates
 }
 
 func (t tree) isVisible(d coordinates, g [][]tree) (bool, int) {
 	isVisible := true
 	scenicScore := 0
-	x, y := t.coordinates.x, t.coordinates.y
-	x += d.x
-	y += d.y
+	x, y := t.X, t.Y
+	x += d.X
+	y += d.Y
 	for x >= 0 && x < len(g[0]) && y >= 0 && y < len(g) {
 		scenicScore++
 		neighbor := g[y][x]
@@ -35,8 +32,8 @@ func (t tree) isVisible(d coordinates, g [][]tree) (bool, int) {
 			isVisible = false
 			break
 		}
-		x += d.x
-		y += d.y
+		x += d.X
+		y += d.Y
 	}
 	return isVisible, scenicScore
 }
@@ -52,7 +49,7 @@ func (f forest) createGrid(s *bufio.Scanner) [][]tree {
 		row := []tree{}
 		for x, c := range s.Text() {
 			height, _ := strconv.Atoi(string(c))
-			row = append(row, tree{height, coordinates{x, y}})
+			row = append(row, tree{height, coordinates{X: x, Y: y}})
 		}
 		grid = append(grid, row)
 		y++
@@ -82,7 +79,7 @@ func (f forest) searchGrid() (string, string) {
 	return strconv.Itoa(treesVisibleFromOutside), strconv.Itoa(maxScenicScore)
 }
 
-func Day8() (string, string) {
+func Solution() (string, string) {
 	file, scanner := helpers.GetFile(8)
 	defer file.Close()
 
@@ -90,3 +87,5 @@ func Day8() (string, string) {
 	f.grid = f.createGrid(scanner)
 	return f.searchGrid()
 }
+
+var Day = helpers.Day{Solution: Solution, Answer: helpers.Answer{Part1: "1700", Part2: "470596"}}

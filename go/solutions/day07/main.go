@@ -1,4 +1,4 @@
-package solutions
+package day07
 
 import (
 	"strconv"
@@ -28,7 +28,7 @@ func (d directory) getSizes() (int, []int) {
 	return getSize(d), sizes
 }
 
-func Day7() (string, string) {
+func Solution() (string, string) {
 	file, scanner := helpers.GetFile(7)
 	defer file.Close()
 
@@ -86,3 +86,5 @@ func Day7() (string, string) {
 
 	return strconv.Itoa(p1), strconv.Itoa(p2)
 }
+
+var Day = helpers.Day{Solution: Solution, Answer: helpers.Answer{Part1: "1307902", Part2: "7068748"}}

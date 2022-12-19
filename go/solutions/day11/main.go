@@ -1,4 +1,4 @@
-package solutions
+package day11
 
 import (
 	"fmt"
@@ -53,7 +53,7 @@ func (m *monkey) catch(item int) {
 	m.items = append(m.items, item)
 }
 
-func Day11() (string, string) {
+func Solution() (string, string) {
 	t1 := getTroop()
 	for i := 0; i < 20; i++ {
 		completeRound(t1, 1)
@@ -212,3 +212,5 @@ func parseCondition(conditionString string) int {
 	}
 	return value
 }
+
+var Day = helpers.Day{Solution: Solution, Answer: helpers.Answer{Part1: "61005", Part2: "20567144694"}}

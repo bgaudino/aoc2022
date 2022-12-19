@@ -1,4 +1,4 @@
-package solutions
+package day15
 
 import (
 	"fmt"
@@ -10,6 +10,7 @@ import (
 	"main.go/go/helpers"
 )
 
+type coordinates helpers.Coordinates
 type coordinatesSet map[coordinates]bool
 type coordinatePairs map[coordinates]coordinates
 type yRange struct {
@@ -20,17 +21,17 @@ type yRange struct {
 const SEARCH_AREA_SIZE = 4000000
 
 func manhattanDistance(c1 coordinates, c2 coordinates) int {
-	x := math.Abs(float64(c1.x) - float64(c2.x))
-	y := math.Abs(float64(c1.y) - float64(c2.y))
+	x := math.Abs(float64(c1.X) - float64(c2.X))
+	y := math.Abs(float64(c1.Y) - float64(c2.Y))
 	return int(x + y)
 }
 
 func tuningFrequency(c coordinates) int {
-	return (c.x * SEARCH_AREA_SIZE) + c.y
+	return (c.X * SEARCH_AREA_SIZE) + c.Y
 }
 
 func isOutOfBounds(c coordinates) bool {
-	return c.x < 0 || c.y < 0 || c.x > SEARCH_AREA_SIZE || c.y > SEARCH_AREA_SIZE
+	return c.X < 0 || c.Y < 0 || c.X > SEARCH_AREA_SIZE || c.Y > SEARCH_AREA_SIZE
 }
 
 func isEmpty(position coordinates, beacons coordinatesSet, sensors coordinatePairs) bool {
@@ -48,7 +49,7 @@ func isEmpty(position coordinates, beacons coordinatesSet, sensors coordinatePai
 	return true
 }
 
-func Day15() (string, string) {
+func Solution() (string, string) {
 	sensors, beacons := parse()
 	targetRow := 2000000
 	columnRanges := make(map[yRange]bool)
@@ -57,12 +58,12 @@ func Day15() (string, string) {
 	currentRange := yRange{0, 0}
 	for sensor, beacon := range sensors {
 		distanceToBeacon := manhattanDistance(sensor, beacon)
-		distanceToRow := manhattanDistance(sensor, coordinates{sensor.x, targetRow})
+		distanceToRow := manhattanDistance(sensor, coordinates{sensor.X, targetRow})
 		if distanceToRow > distanceToBeacon {
 			continue
 		}
-		offset := int(math.Abs(float64(sensor.y) - float64(targetRow)))
-		columnRange := yRange{sensor.x - distanceToBeacon + offset, sensor.x + distanceToBeacon - offset}
+		offset := int(math.Abs(float64(sensor.Y) - float64(targetRow)))
+		columnRange := yRange{sensor.X - distanceToBeacon + offset, sensor.X + distanceToBeacon - offset}
 
 		// Don't overlap
 		if columnRange.start > currentRange.stop || columnRange.stop < currentRange.start {
@@ -109,10 +110,10 @@ func Day15() (string, string) {
 func findSignal(sensors coordinatePairs, beacons coordinatesSet) *coordinates {
 	for sensor, beacon := range sensors {
 		distance := manhattanDistance(sensor, beacon) + 1
-		for x := sensor.x - 1; x <= sensor.x+distance; x++ {
-			offset := int(math.Abs(float64(x) - float64(sensor.x)))
-			top := coordinates{x, sensor.y - distance + offset}
-			bottom := coordinates{x, sensor.y + distance - offset}
+		for x := sensor.X - 1; x <= sensor.X+distance; x++ {
+			offset := int(math.Abs(float64(x) - float64(sensor.X)))
+			top := coordinates{x, sensor.Y - distance + offset}
+			bottom := coordinates{x, sensor.Y + distance - offset}
 			if !isOutOfBounds(top) && isEmpty(top, beacons, sensors) {
 				return &top
 			}
@@ -134,13 +135,13 @@ func parse() (coordinatePairs, coordinatesSet) {
 	for scanner.Scan() {
 		parts := strings.Split(scanner.Text(), " ")
 		sensor := coordinates{
-			x: parseCoordinate(parts[2]),
-			y: parseCoordinate(parts[3]),
+			X: parseCoordinate(parts[2]),
+			Y: parseCoordinate(parts[3]),
 		}
 
 		beacon := coordinates{
-			x: parseCoordinate(parts[8]),
-			y: parseCoordinate(parts[9]),
+			X: parseCoordinate(parts[8]),
+			Y: parseCoordinate(parts[9]),
 		}
 		beacons[beacon] = true
 		sensors[sensor] = beacon
@@ -158,3 +159,5 @@ func parseCoordinate(s string) int {
 	}
 	return i
 }
+
+var Day = helpers.Day{Solution: Solution, Answer: helpers.Answer{Part1: "4582667", Part2: "10961118625406"}}

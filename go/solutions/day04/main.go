@@ -1,4 +1,4 @@
-package solutions
+package day04
 
 import (
 	"strconv"
@@ -39,7 +39,7 @@ func (e elfPair) opposite() elfPair {
 	return elfPair{e.b, e.a}
 }
 
-func Day4() (string, string) {
+func Solution() (string, string) {
 	file, scanner := helpers.GetFile(4)
 	defer file.Close()
 
@@ -70,3 +70,5 @@ func getCampSectionRange(s string) campSectionRange {
 	}
 	return campSectionRange{r[0], r[1]}
 }
+
+var Day = helpers.Day{Solution: Solution, Answer: helpers.Answer{Part1: "424", Part2: "804"}}

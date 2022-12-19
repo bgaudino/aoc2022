@@ -1,4 +1,4 @@
-package solutions
+package day01
 
 import (
 	"sort"
@@ -7,7 +7,7 @@ import (
 	"main.go/go/helpers"
 )
 
-func Day1() (string, string) {
+func Solution() (string, string) {
 	calorieTotals := []int{}
 	elfItemCalories := []int{}
 	file, scanner := helpers.GetFile(1)
@@ -31,3 +31,5 @@ func Day1() (string, string) {
 	p1, p2 := strconv.Itoa(calorieTotals[0]), strconv.Itoa(helpers.Sum(calorieTotals[:3]))
 	return p1, p2
 }
+
+var Day = helpers.Day{Solution: Solution, Answer: helpers.Answer{Part1: "72070", Part2: "211805"}}
