@@ -33,12 +33,12 @@ func isOutOfBounds(c coordinates) bool {
 	return c.x < 0 || c.y < 0 || c.x > SEARCH_AREA_SIZE || c.y > SEARCH_AREA_SIZE
 }
 
-func isEmpty(position coordinates, beacons coordinatesSet, sensorBeaconPairs coordinatePairs) bool {
-	_, ok := sensorBeaconPairs[position]
+func isEmpty(position coordinates, beacons coordinatesSet, sensors coordinatePairs) bool {
+	_, ok := sensors[position]
 	if beacons[position] || ok {
 		return false
 	}
-	for sensor, beacon := range sensorBeaconPairs {
+	for sensor, beacon := range sensors {
 		sensorRange := manhattanDistance(sensor, beacon)
 		distanceToSensor := manhattanDistance(sensor, position)
 		if sensorRange >= distanceToSensor {
