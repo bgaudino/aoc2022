@@ -1,7 +1,10 @@
 
 import re
 from dataclasses import dataclass
+from itertools import combinations
+import math
 from functools import cached_property
+from heapq import nlargest
 
 from utils import get_data
 
@@ -40,8 +43,8 @@ class Tunnels:
 
         return -1
 
-    def find_max_relief(self):
-        max_relief = 0
+    def get_paths(self, minutes=30):
+        scenarios = dict()
         stack = [[0, 0, self.starting_valve]]  # distance, pressure, valves
         while stack:
             path = stack.pop(0)
@@ -54,13 +57,12 @@ class Tunnels:
                 remaining_valves = path[2:-1]
                 distance = self.distances[current][next_valve] + 1
 
-                if elapsed_time + distance >= self.time:
+                if elapsed_time + distance >= minutes:
                     for valve in remaining_valves:
-                        time_remaining = self.time - elapsed_time
+                        time_remaining = minutes - elapsed_time
                         pressure += self.valves.get(valve, 0) * time_remaining
-                    path[0], path[1] = self.time, pressure
-                    if pressure > max_relief:
-                        max_relief = pressure
+                    path[0], path[1] = minutes, pressure
+                    scenarios[tuple(path[3:])] = pressure
                     continue
 
                 path[0] += distance
@@ -68,7 +70,7 @@ class Tunnels:
                     path[1] += self.valves.get(valve, 0) * distance
                 stack.append(path)
 
-        return max_relief
+        return scenarios
 
 
 def parse():
@@ -85,7 +87,27 @@ def parse():
 
 
 def main():
-    return Tunnels(*parse()).find_max_relief()
+    tunnels = Tunnels(*parse())
+    paths = tunnels.get_paths()
+    part1 = max(paths.values())
+
+    paths = sorted(
+        tunnels.get_paths(26).items(), key=lambda x: x[1], reverse=True
+    )
+    part2 = 0
+    # This will take a very long time
+    for my_valves, my_relief in paths:
+        if my_relief * 2 < part2:
+            break
+        for elephant_valves, elephant_relief in paths:
+            if set(my_valves).intersection(set(elephant_valves)):
+                continue
+            new_max = max(part2, my_relief + elephant_relief)
+            if new_max > part2:
+                part2 = new_max
+            break
+
+    return part1, part2
 
 
 if __name__ == '__main__':
