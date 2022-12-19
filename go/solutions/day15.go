@@ -33,13 +33,14 @@ func isOutOfBounds(c coordinates) bool {
 	return c.x < 0 || c.y < 0 || c.x > SEARCH_AREA_SIZE || c.y > SEARCH_AREA_SIZE
 }
 
-func isEmpty(sensor coordinates, position coordinates, sensors coordinatesSet, beacons coordinatesSet, sensorBeaconPairs coordinatePairs) bool {
-	if beacons[position] || sensors[position] {
+func isEmpty(position coordinates, beacons coordinatesSet, sensorBeaconPairs coordinatePairs) bool {
+	_, ok := sensorBeaconPairs[position]
+	if beacons[position] || ok {
 		return false
 	}
-	for s := range sensors {
-		sensorRange := manhattanDistance(s, sensorBeaconPairs[s])
-		distanceToSensor := manhattanDistance(s, position)
+	for sensor, beacon := range sensorBeaconPairs {
+		sensorRange := manhattanDistance(sensor, beacon)
+		distanceToSensor := manhattanDistance(sensor, position)
 		if sensorRange >= distanceToSensor {
 			return false
 		}
@@ -48,13 +49,13 @@ func isEmpty(sensor coordinates, position coordinates, sensors coordinatesSet, b
 }
 
 func Day15() (string, string) {
-	sensors, beacons, sensorBeaconPairs := parse()
+	sensors, beacons := parse()
 	targetRow := 2000000
 	columnRanges := make(map[yRange]bool)
 
 	// Part 1
 	currentRange := yRange{0, 0}
-	for sensor, beacon := range sensorBeaconPairs {
+	for sensor, beacon := range sensors {
 		distanceToBeacon := manhattanDistance(sensor, beacon)
 		distanceToRow := manhattanDistance(sensor, coordinates{sensor.x, targetRow})
 		if distanceToRow > distanceToBeacon {
@@ -86,7 +87,8 @@ func Day15() (string, string) {
 	for cr := range columnRanges {
 		for i := cr.start; i <= cr.stop; i++ {
 			c := coordinates{i, targetRow}
-			if !beacons[c] && !sensors[c] {
+			_, ok := sensors[c]
+			if !beacons[c] && !ok {
 				eliminated[c] = true
 			}
 		}
@@ -94,7 +96,7 @@ func Day15() (string, string) {
 	numSquaresWithNoBeacon := len(eliminated)
 
 	// Part 2
-	signal := findSignal(sensors, beacons, sensorBeaconPairs)
+	signal := findSignal(sensors, beacons)
 	if signal == nil {
 		fmt.Println("Oops")
 		os.Exit(1)
@@ -104,59 +106,46 @@ func Day15() (string, string) {
 	return strconv.Itoa(numSquaresWithNoBeacon), strconv.Itoa(frequency)
 }
 
-func findSignal(sensors coordinatesSet, beacons coordinatesSet, sensorBeaconPairs coordinatePairs) *coordinates {
-	for sensor := range sensors {
-		distance := manhattanDistance(sensor, sensorBeaconPairs[sensor]) + 1
-		for x := sensor.x + 1; x <= sensor.x+distance; x++ {
+func findSignal(sensors coordinatePairs, beacons coordinatesSet) *coordinates {
+	for sensor, beacon := range sensors {
+		distance := manhattanDistance(sensor, beacon) + 1
+		for x := sensor.x - 1; x <= sensor.x+distance; x++ {
 			offset := int(math.Abs(float64(x) - float64(sensor.x)))
 			top := coordinates{x, sensor.y - distance + offset}
 			bottom := coordinates{x, sensor.y + distance - offset}
-			if !isOutOfBounds(top) && isEmpty(sensor, top, sensors, beacons, sensorBeaconPairs) {
+			if !isOutOfBounds(top) && isEmpty(top, beacons, sensors) {
 				return &top
 			}
-			if !isOutOfBounds(bottom) && isEmpty(sensor, bottom, sensors, beacons, sensorBeaconPairs) {
+			if !isOutOfBounds(bottom) && isEmpty(bottom, beacons, sensors) {
 				return &bottom
 			}
 
-		}
-		for x := sensor.x - 1; x >= sensor.x-distance; x-- {
-			offset := int(math.Abs(float64(x) - float64(sensor.x)))
-			top := coordinates{x, sensor.y - distance + offset}
-			bottom := coordinates{x, sensor.y + distance - offset}
-			if !isOutOfBounds(top) && isEmpty(sensor, top, sensors, beacons, sensorBeaconPairs) {
-				return &top
-			}
-			if !isOutOfBounds(bottom) && isEmpty(sensor, bottom, sensors, beacons, sensorBeaconPairs) {
-				return &bottom
-			}
 		}
 	}
 	return nil
 }
 
-func parse() (coordinatesSet, coordinatesSet, coordinatePairs) {
+func parse() (coordinatePairs, coordinatesSet) {
 	file, scanner := helpers.GetFile(15)
 	defer file.Close()
 
-	sensors := make(coordinatesSet)
 	beacons := make(coordinatesSet)
-	pairs := make(coordinatePairs)
+	sensors := make(coordinatePairs)
 	for scanner.Scan() {
 		parts := strings.Split(scanner.Text(), " ")
 		sensor := coordinates{
 			x: parseCoordinate(parts[2]),
 			y: parseCoordinate(parts[3]),
 		}
-		sensors[sensor] = true
 
 		beacon := coordinates{
 			x: parseCoordinate(parts[8]),
 			y: parseCoordinate(parts[9]),
 		}
 		beacons[beacon] = true
-		pairs[sensor] = beacon
+		sensors[sensor] = beacon
 	}
-	return sensors, beacons, pairs
+	return sensors, beacons
 }
 
 func parseCoordinate(s string) int {
