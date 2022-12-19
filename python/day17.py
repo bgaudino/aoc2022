@@ -177,7 +177,7 @@ def drop_rocks(iterations):
         return tower.height
 
     # Get height after last cycle
-    remainder = (iterations - cycle_start) % cycle_length
+    remainder = (iterations - cycle_start) % cycle_length - 1
     for i in range(remainder):
         tower.fall()
     remainder_height = tower.height - pre_cycle_height - cycle_height
