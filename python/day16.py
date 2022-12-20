@@ -1,10 +1,7 @@
 
 import re
 from dataclasses import dataclass
-from itertools import combinations
-import math
 from functools import cached_property
-from heapq import nlargest
 
 from utils import get_data
 
