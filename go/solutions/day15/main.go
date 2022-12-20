@@ -51,7 +51,6 @@ func Solution() (string, string) {
 
 	// Part 1
 	sensorRange := make(map[int]bool)
-	fmt.Println(len(sensors))
 	for sensor, beacon := range sensors {
 		distanceToBeacon := manhattanDistance(sensor, beacon)
 		distanceToRow := manhattanDistance(sensor, coordinates{sensor.X, targetRow})

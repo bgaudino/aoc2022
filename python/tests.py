@@ -1,14 +1,14 @@
 from dataclasses import dataclass
 
-import day1
-import day2
-import day3
-import day4
-import day5
-import day6
-import day7
-import day8
-import day9
+import day01
+import day02
+import day03
+import day04
+import day05
+import day06
+import day07
+import day08
+import day09
 import day10
 import day11
 import day12
@@ -27,15 +27,15 @@ class Day:
 
 
 days = [
-    Day(day1, 72070, 211805),
-    Day(day2, 14297, 10498),
-    Day(day3, 7826, 2577),
-    Day(day4, 424, 804),
-    Day(day5, 'FJSRQCFTN', 'CJVLJQPHS'),
-    Day(day6, 1912, 2122),
-    Day(day7, 1307902, 7068748),
-    Day(day8, 1700, 470596),
-    Day(day9, 6081, 2487),
+    Day(day01, 72070, 211805),
+    Day(day02, 14297, 10498),
+    Day(day03, 7826, 2577),
+    Day(day04, 424, 804),
+    Day(day05, 'FJSRQCFTN', 'CJVLJQPHS'),
+    Day(day06, 1912, 2122),
+    Day(day07, 1307902, 7068748),
+    Day(day08, 1700, 470596),
+    Day(day09, 6081, 2487),
     Day(day10, 13740, day10.part2_answer),
     Day(day11, 61005, 20567144694),
     Day(day12, 412, 402),
