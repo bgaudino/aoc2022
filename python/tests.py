@@ -14,6 +14,7 @@ import day11
 import day12
 import day13
 import day14
+import day15
 import day16
 import day17
 
@@ -40,6 +41,7 @@ days = [
     Day(day12, 412, 402),
     Day(day13, 6070, 20758),
     Day(day14, 979, 29044),
+    Day(day15, 4582667, 10961118625406),
     Day(day16, 2056, 2513),
     Day(day17, 3114, 1540804597682),
 ]
