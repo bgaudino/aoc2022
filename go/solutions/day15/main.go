@@ -13,10 +13,6 @@ import (
 type coordinates helpers.Coordinates
 type coordinatesSet map[coordinates]bool
 type coordinatePairs map[coordinates]coordinates
-type yRange struct {
-	start int
-	stop  int
-}
 
 const SEARCH_AREA_SIZE = 4000000
 
@@ -52,10 +48,10 @@ func isEmpty(position coordinates, beacons coordinatesSet, sensors coordinatePai
 func Solution() (string, string) {
 	sensors, beacons := parse()
 	targetRow := 2000000
-	columnRanges := make(map[yRange]bool)
 
 	// Part 1
-	currentRange := yRange{0, 0}
+	sensorRange := make(map[int]bool)
+	fmt.Println(len(sensors))
 	for sensor, beacon := range sensors {
 		distanceToBeacon := manhattanDistance(sensor, beacon)
 		distanceToRow := manhattanDistance(sensor, coordinates{sensor.X, targetRow})
@@ -63,38 +59,10 @@ func Solution() (string, string) {
 			continue
 		}
 		offset := int(math.Abs(float64(sensor.Y) - float64(targetRow)))
-		columnRange := yRange{sensor.X - distanceToBeacon + offset, sensor.X + distanceToBeacon - offset}
-
-		// Don't overlap
-		if columnRange.start > currentRange.stop || columnRange.stop < currentRange.start {
-			columnRanges[currentRange] = true
-			currentRange = columnRange
-			continue
-		}
-
-		// Extends right
-		if columnRange.stop > currentRange.stop {
-			currentRange.stop = columnRange.stop
-		}
-
-		// Extends left
-		if columnRange.start < currentRange.start {
-			currentRange.start = columnRange.start
+		for x := sensor.X - distanceToBeacon + offset; x < sensor.X+distanceToBeacon-offset; x++ {
+			sensorRange[x] = true
 		}
 	}
-	columnRanges[currentRange] = true
-
-	eliminated := make(coordinatesSet)
-	for cr := range columnRanges {
-		for i := cr.start; i <= cr.stop; i++ {
-			c := coordinates{i, targetRow}
-			_, ok := sensors[c]
-			if !beacons[c] && !ok {
-				eliminated[c] = true
-			}
-		}
-	}
-	numSquaresWithNoBeacon := len(eliminated)
 
 	// Part 2
 	signal := findSignal(sensors, beacons)
@@ -104,7 +72,7 @@ func Solution() (string, string) {
 	}
 	frequency := tuningFrequency(*signal)
 
-	return strconv.Itoa(numSquaresWithNoBeacon), strconv.Itoa(frequency)
+	return strconv.Itoa(len(sensorRange)), strconv.Itoa(frequency)
 }
 
 func findSignal(sensors coordinatePairs, beacons coordinatesSet) *coordinates {
