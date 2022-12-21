@@ -17,6 +17,8 @@ import day14
 import day15
 import day16
 import day17
+import day18
+import day20
 
 
 @dataclass
@@ -44,6 +46,8 @@ days = [
     Day(day15, 4582667, 10961118625406),
     Day(day16, 2056, 2513),
     Day(day17, 3114, 1540804597682),
+    Day(day18, 4628, 2582),
+    Day(day20, 11073, 11102539613040),
 ]
 
 total_errors = 0
