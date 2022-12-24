@@ -5,14 +5,6 @@ from utils import get_data
 
 DIRECTIONS = ((1, 0), (0, 1), (-1, 0), (0, -1))
 SYMBOLS = ('>', 'v', '<', '^')
-SIDE_MAP = {
-    0: {2: 3, 3: 5},
-    1: {0: 4, 1: 2, 3: 5},
-    2: {0: 1, 2: 3},
-    3: {2: 0, 3: 2},
-    4: {0: 1, 1: 5},
-    5: {0: 4, 1: 1, 2: 0}
-}
 
 
 class Board:
@@ -81,43 +73,43 @@ class Board:
 
     def wrap_3d(self):
         side, x, y = self._on_side()
-        match side:
-            case 2:
-                if self.facing == 3:
-                    new_side = self.sides[0]
-                    xx = 0
-                    yy = x
-                    new_location = new_side[yy][xx]
-                    can_wrap = self._can_wrap(
-                        self.grid[new_location[1]][new_location[0]]
-                    )
-                    self.location = new_location if can_wrap else self.location
-                    self.facing = 0 if can_wrap else self.facing
-                    return can_wrap
-            case 3:
-                new_side = self.sides[5]
-                xx = self.invert_coordinates(y)
-                yy = 0
-                new_location = new_side[yy][xx]
-                can_wrap = self._can_wrap(
-                    self.grid[new_location[1]][new_location[0]]
-                )
-                self.location = new_location if can_wrap else self.location
-                self.facing = 1 if can_wrap else self.facing
-                return can_wrap
-            case 4:
-                if self.facing == 1:
-                    new_side = self.sides[1]
-                    yy = self.side_length - 1
-                    xx = self.invert_coordinates(x)
-                    new_location = new_side[yy][xx]
-                    can_wrap = self._can_wrap(
-                        self.grid[new_location[1]][new_location[0]]
-                    )
-                    self.location = new_location if can_wrap else self.location
-                    self.facing = 3 if can_wrap else self.facing
-                    return can_wrap
-        raise Exception(self.location, side, self.facing)
+        # {from_side: {from_facing: (to_side, to_facing, new_x, new_y)}}
+        side_map = {
+            0: {
+                2: (3, 0, 0, self.invert_coordinates(y)),
+                3: (5, 0, 0, x),
+            },
+            1: {
+                0:  (4, 2, self.side_length - 1, self.invert_coordinates(y)),
+                1:  (2, 2, self.side_length - 1, x),
+                3:  (5, 3, self.invert_coordinates(x), self.side_length - 1),
+            },
+            2: {
+                0: (1, 1, y, self.side_length - 1),
+                2: (3, 1, y, 0),
+            },
+            3: {
+                2: (0, 0, 0, self.invert_coordinates(y)),
+                3: (2, 0, 0, x),
+            },
+            4: {
+                0: (1, 2, self.side_length - 1, self.invert_coordinates(y)),
+                1: (5, 2, self.side_length - 1, x),
+            },
+            5: {
+                0: (4, 3, y, self.side_length - 1),
+                1: (1, 3, self.invert_coordinates(x), self.side_length - 1),
+                2: (0, 3, y, 0),
+            }
+        }
+        new_side, new_facing, xx, yy = side_map[side][self.facing]
+        new_location = self.sides[new_side][yy][xx]
+        can_wrap = self._can_wrap(
+            self.grid[new_location[1]][new_location[0]]
+        )
+        self.location = new_location if can_wrap else self.location
+        self.facing = new_facing if can_wrap else self.facing
+        return can_wrap
 
     def invert_coordinates(self, n):
         i, j = 0, self.side_length - 1
@@ -201,8 +193,6 @@ class Board:
     def process_move(self, is_3d=False):
         if isinstance(self.current_move, int):
             for _ in range(self.current_move):
-                self.print()
-                input()
                 space, new_location = self.take_step()
                 if space == '.':
                     self.location = new_location
@@ -222,8 +212,6 @@ class Board:
             self.rotate_clockwise()
         self.move_index += 1
         self.add_state()
-        self.print()
-        input()
 
     @property
     def password(self):
@@ -272,24 +260,20 @@ class Board:
         return None
 
 
-def main(print_board=False):
+def main():
     board = Board(get_data(22))
-    # board.print_sides()
     for _ in range(len(board.moves)):
         board.process_move()
-    # if print_board:
-        # board.print()
-    password = board.password
-    print(password)
+    password1 = board.password
 
     board.reset()
     board.location = board.start
     for _ in range(len(board.moves)):
         board.process_move(is_3d=True)
-    board.print()
-    print(board.password)
-    return None
+    password2 = board.password
+
+    return password1, password2
 
 
 if __name__ == '__main__':
-    print(main(print_board=True))
+    print(main())
