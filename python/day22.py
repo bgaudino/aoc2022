@@ -1,10 +1,19 @@
 import math
+from dataclasses import dataclass
 from functools import cached_property
 
 from utils import get_data
 
 DIRECTIONS = ((1, 0), (0, 1), (-1, 0), (0, -1))
 SYMBOLS = ('>', 'v', '<', '^')
+
+
+@dataclass
+class Edge:
+    side: int
+    facing: int
+    x: int
+    y: int
 
 
 class Board:
@@ -55,10 +64,9 @@ class Board:
     def current_move(self):
         return self.moves[self.move_index]
 
-    def take_step(self):
+    def get_next_setp(self):
         x, y = self.location
         dx, dy = DIRECTIONS[self.facing]
-        # tx, ty = (x + dx) % len(self.grid[y]), (y + dy) % len(self.grid) # part 1?
         tx, ty = x + dx, y + dy
         try:
             return self.grid[ty][tx], (tx, ty)
@@ -72,43 +80,49 @@ class Board:
         self.facing = (self.facing - 1) % 4
 
     def wrap_3d(self):
-        side, x, y = self._on_side()
-        # {from_side: {from_facing: (to_side, to_facing, new_x, new_y)}}
+        side, x, y = self._get_side()
+        # example_map = {
+        #     2: {3: Edge(0, 0, 0, x)},
+        #     3: {0: Edge(5, 1, self.invert_coordinates(y), 0)},
+        #     4: {1: Edge(1, 3, self.invert_coordinates(x), self.side_length - 1)},
+        # }
+
+        # This only works with my input
         side_map = {
             0: {
-                2: (3, 0, 0, self.invert_coordinates(y)),
-                3: (5, 0, 0, x),
+                2: Edge(3, 0, 0, self.invert_coordinates(y)),
+                3: Edge(5, 0, 0, x),
             },
             1: {
-                0:  (4, 2, self.side_length - 1, self.invert_coordinates(y)),
-                1:  (2, 2, self.side_length - 1, x),
-                3:  (5, 3, self.invert_coordinates(x), self.side_length - 1),
+                0: Edge(4, 2, self.side_length - 1, self.invert_coordinates(y)),
+                1: Edge(2, 2, self.side_length - 1, x),
+                3: Edge(5, 3, x, self.side_length - 1),
             },
             2: {
-                0: (1, 1, y, self.side_length - 1),
-                2: (3, 1, y, 0),
+                0: Edge(1, 3, y, self.side_length - 1),
+                2: Edge(3, 1, y, 0),
             },
             3: {
-                2: (0, 0, 0, self.invert_coordinates(y)),
-                3: (2, 0, 0, x),
+                2: Edge(0, 0, 0, self.invert_coordinates(y)),
+                3: Edge(2, 0, 0, x),
             },
             4: {
-                0: (1, 2, self.side_length - 1, self.invert_coordinates(y)),
-                1: (5, 2, self.side_length - 1, x),
+                0: Edge(1, 2, self.side_length - 1, self.invert_coordinates(y)),
+                1: Edge(5, 2, self.side_length - 1, x),
             },
             5: {
-                0: (4, 3, y, self.side_length - 1),
-                1: (1, 3, self.invert_coordinates(x), self.side_length - 1),
-                2: (0, 3, y, 0),
+                0: Edge(4, 3, y, self.side_length - 1),
+                1: Edge(1, 1, x, 0),
+                2: Edge(0, 1, y, 0),
             }
         }
-        new_side, new_facing, xx, yy = side_map[side][self.facing]
-        new_location = self.sides[new_side][yy][xx]
+        edge = side_map[side][self.facing]
+        new_x, new_y = self.sides[edge.side][edge.y][edge.x]
         can_wrap = self._can_wrap(
-            self.grid[new_location[1]][new_location[0]]
+            self.grid[new_y][new_x]
         )
-        self.location = new_location if can_wrap else self.location
-        self.facing = new_facing if can_wrap else self.facing
+        self.location = (new_x, new_y) if can_wrap else self.location
+        self.facing = edge.facing if can_wrap else self.facing
         return can_wrap
 
     def invert_coordinates(self, n):
@@ -184,16 +198,12 @@ class Board:
         return sides
 
     def add_state(self):
-        x, y = self.location
-        if self.grid[y][x] == ' ':
-            self.print()
-            raise Exception('Foo')
         self.states[self.location] = SYMBOLS[self.facing]
 
     def process_move(self, is_3d=False):
         if isinstance(self.current_move, int):
             for _ in range(self.current_move):
-                space, new_location = self.take_step()
+                space, new_location = self.get_next_setp()
                 if space == '.':
                     self.location = new_location
                     self.add_state()
@@ -205,7 +215,7 @@ class Board:
                 elif space == '#':
                     break
                 else:
-                    raise Exception(space)
+                    raise Exception('How did we get here?', space)
         elif self.current_move == 'L':
             self.rotate_counter_clockwise()
         elif self.current_move == 'R':
@@ -238,18 +248,7 @@ class Board:
             print()
         print()
 
-    def print_sides(self):
-        for y in range(len(self.grid)):
-            row = self.grid[y]
-            for x in range(len(row)):
-                side = self._on_side((x, y))
-                if side is None:
-                    print(' ', end='')
-                else:
-                    print(side[0], end='')
-            print()
-
-    def _on_side(self, location=None):
+    def _get_side(self, location=None):
         if not location:
             location = self.location
         for i, side in enumerate(self.sides):
