@@ -24,6 +24,7 @@ import day21
 import day22
 import day23
 import day24
+import day25
 
 
 @dataclass
@@ -58,12 +59,16 @@ days = [
     Day(day22, 93226, 37415),
     Day(day23, 4172, 942),
     Day(day24, 230, 713),
+    Day(day25, '121=2=1==0=10=2-20=2', None)
 ]
 
 total_errors = 0
 for i, day in enumerate(days):
     errors = 0
-    part1, part2 = day.solution.main()
+    try:
+        part1, part2 = day.solution.main()
+    except ValueError:
+        part1, part2 = day.solution.main(), None
     try:
         assert part1 == day.part1
     except AssertionError:
